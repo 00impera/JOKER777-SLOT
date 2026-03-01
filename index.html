@@ -25,13 +25,13 @@
       min-height: 100vh;
     }
     .container {
-      max-width: 420px;
-      margin: 32px auto 0;
+      max-width: 600px;
+      margin: 40px auto 0;
       background: rgba(0,255,100,0.04);
-      border: 1px solid var(--blue);
-      border-radius: 24px;
-      padding: 32px 16px 24px;
-      box-shadow: 0 0 32px #00ff6615;
+      border: 2px solid var(--blue);
+      border-radius: 32px;
+      padding: 48px 24px 36px;
+      box-shadow: 0 0 64px #00ff6615;
     }
     h1 {
       font-size: 2.5em;
@@ -85,14 +85,24 @@
     }
     .jackpot .val { color: var(--gold); font-size: 1.3em; font-weight: bold; }
     .reels {
-      display: flex; justify-content: center; gap: 18px; margin: 18px 0 10px 0;
+      display: flex; justify-content: center; gap: 36px; margin: 36px 0 18px 0;
     }
     .reel {
-      width: 64px; height: 64px; background: #111;
-      border-radius: 16px;
+      width: 120px; height: 160px; background: #181818;
+      border-radius: 24px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.5em; box-shadow: 0 0 12px var(--neon);
+      font-size: 4.5em; box-shadow: 0 8px 32px #00ff6630, 0 0 0 4px var(--gold) inset;
+      border: 3px solid var(--gold);
       user-select: none;
+      transition: box-shadow 0.2s, border 0.2s;
+      position: relative;
+    }
+    .reel:after {
+      content: "";
+      position: absolute; left: 0; right: 0; top: 0; height: 30%;
+      background: linear-gradient(180deg,rgba(255,255,255,0.12),transparent);
+      border-radius: 24px 24px 0 0;
+      pointer-events: none;
     }
     .bet-row {
       text-align: center; margin-bottom: 12px;
@@ -121,10 +131,13 @@
     .footer {
       text-align: center; color: #444; font-size: 1em; margin: 32px 0 0 0;
     }
-    @media (max-width: 500px) {
-      .container { padding: 18px 2vw 18px; }
-      .reel { width: 48px; height: 48px; font-size: 1.7em; }
-      .spin-btn { font-size: 1.1em; padding: 12px 18px; min-width: 120px; }
+    .package-row { text-align:center; margin:18px 0; }
+    .package-row .bet-btn { margin: 4px 2px; }
+    #spinsLeft { color: var(--gold); font-size: 1.1em; }
+    @media (max-width: 700px) {
+      .container { max-width: 98vw; padding: 18px 2vw 18px; }
+      .reel { width: 70px; height: 90px; font-size: 2.2em; }
+      .reels { gap: 12px; }
     }
   </style>
 </head>
@@ -144,11 +157,23 @@
       Jackpot Pool: <span class="val" id="jackpotVal">0.00</span> MON
     </div>
     <div class="reels">
-      <div class="reel" id="reel0">🃏</div>
-      <div class="reel" id="reel1">💎</div>
+      <div class="reel" id="reel0">🍒</div>
+      <div class="reel" id="reel1">🍋</div>
       <div class="reel" id="reel2">7️⃣</div>
     </div>
     <div class="bet-row" id="betRow"></div>
+    <!-- Spin Packages -->
+    <div class="package-row" id="packageRow">
+      <button class="bet-btn" onclick="buyPackage(100, 1000)">100 Spins / 1000 MON</button>
+      <button class="bet-btn" onclick="buyPackage(200, 2000)">200 Spins / 2000 MON</button>
+      <button class="bet-btn" onclick="buyPackage(300, 3000)">300 Spins / 3000 MON</button>
+      <button class="bet-btn" onclick="buyPackage(400, 5000)">400 Spins / 5000 MON</button>
+      <button class="bet-btn" onclick="buyPackage(500, 10000)">500 Spins / 10000 MON</button>
+      <button class="bet-btn" onclick="buyPackage(1000, 100000)">1000 Spins / 100000 MON</button>
+    </div>
+    <div style="text-align:center;">
+      <span id="spinsLeft">Spins left: 0</span>
+    </div>
     <button id="btnSpin" class="spin-btn" disabled>SPIN</button>
     <div class="status" id="status"></div>
     <div id="txRow" style="text-align:center; margin-top:6px;"></div>
@@ -161,192 +186,46 @@
     // --- CONFIG ---
     const SLOT_ADDR = "0xE538Abc2a84e51b68d7EE84d8b10E3DF8F9Cf968";
     const SLOT_ABI = [
-  {
-    inputs: [{ internalType: "address", name: "_owner", type: "address" }],
-    stateMutability: "nonpayable",
-    type: "constructor",
-  },
-  {
-    inputs: [{ internalType: "address", name: "owner", type: "address" }],
-    name: "OwnableInvalidOwner",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "OwnableUnauthorizedAccount",
-    type: "error",
-  },
-  { inputs: [], name: "ReentrancyGuardReentrantCall", type: "error" },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "OwnershipTransferred",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "player",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "betAmount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "rand",
-        type: "uint256",
-      },
-      { indexed: false, internalType: "bool", name: "win", type: "bool" },
-      { indexed: false, internalType: "bool", name: "jackpot", type: "bool" },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "payout",
-        type: "uint256",
-      },
-    ],
-    name: "Spin",
-    type: "event",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    name: "allowedBets",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "allowedBetsLength",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "jackpotChance",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "jackpotFee",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "jackpotPool",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "nftContract",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "paused",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "renounceOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "_nft", type: "address" }],
-    name: "setNFTContract",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "bool", name: "v", type: "bool" }],
-    name: "setPaused",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "betIndex", type: "uint256" }],
-    name: "spin",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
-    name: "transferOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "winChance",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "winMultiplier",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "withdraw",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  { stateMutability: "payable", type: "receive" },
-];
-
-    const SYMBOLS = ["🃏","7️⃣","💎","🌙","💰","💸","💵","🏅","🪙","🎁"];
+      {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+      {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},
+      {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},
+      {"inputs":[],"name":"ReentrancyGuardReentrantCall","type":"error"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rand","type":"uint256"},{"indexed":false,"internalType":"bool","name":"win","type":"bool"},{"indexed":false,"internalType":"bool","name":"jackpot","type":"bool"},{"indexed":false,"internalType":"uint256","name":"payout","type":"uint256"}],"name":"Spin","type":"event"},
+      {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"allowedBets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"allowedBetsLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"jackpotChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"jackpotFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"jackpotPool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"nftContract","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"address","name":"_nft","type":"address"}],"name":"setNFTContract","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"bool","name":"v","type":"bool"}],"name":"setPaused","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"betIndex","type":"uint256"}],"name":"spin","outputs":[],"stateMutability":"payable","type":"function"},
+      {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[],"name":"winChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"winMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"stateMutability":"payable","type":"receive"}
+    ];
+    // Classic slot symbols
+    const SYMBOLS = [
+      "🍒", // cherry
+      "🍋", // lemon
+      "🍉", // watermelon
+      "🔔", // bell
+      "💎", // diamond
+      "7️⃣", // seven
+      "🃏", // joker/wild
+      "⭐", // star
+      "💰", // money bag
+      "👑"  // crown
+    ];
     // --- State ---
     let provider, signer, slot, address, bets = [], betIdx = 0, spinning = false;
+    let prepaidSpins = 0;
     // --- UI Elements ---
     const btnConnect = document.getElementById("btnConnect");
     const connLabel = document.getElementById("connLabel");
@@ -357,6 +236,59 @@
     const btnSpin = document.getElementById("btnSpin");
     const status = document.getElementById("status");
     const txRow = document.getElementById("txRow");
+    const spinsLeft = document.getElementById("spinsLeft");
+    // --- SOUND ---
+    let audioCtx;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+    function playTone(freq, type, dur, vol=0.2, delay=0) {
+      try {
+        const ctx = getAudioCtx();
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = type; o.frequency.setValueAtTime(freq, ctx.currentTime+delay);
+        g.gain.setValueAtTime(vol, ctx.currentTime+delay);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+dur);
+        o.start(ctx.currentTime+delay); o.stop(ctx.currentTime+delay+dur+0.01);
+      } catch {}
+    }
+    function playNoise(dur, vol=0.12) {
+      try {
+        const ctx = getAudioCtx();
+        const buf = ctx.createBuffer(1, ctx.sampleRate*dur, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i=0; i<data.length; i++) data[i]=(Math.random()*2-1);
+        const src = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+        f.type='bandpass'; f.frequency.value=800; f.Q.value=0.5;
+        src.buffer=buf; src.connect(f); f.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(vol, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+        src.start(); src.stop(ctx.currentTime+dur+0.05);
+      } catch {}
+    }
+    function soundSpin() {
+      for (let i=0; i<3; i++) {
+        playTone(180+i*60, 'sawtooth', 0.13, 0.09, i*0.07);
+        playTone(180+i*60*1.5, 'sawtooth', 0.10, 0.07, i*0.07+0.04);
+      }
+      playNoise(0.3, 0.13);
+    }
+    function soundWin() {
+      [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.18,0.25,i*0.12));
+    }
+    function soundJackpot() {
+      [523,659,784,1047,1319,1568].forEach((f,i)=>{
+        playTone(f,'sine',0.25,0.3,i*0.1);
+        playTone(f*1.5,'triangle',0.18,0.15,i*0.1+0.05);
+      });
+    }
+    function soundLose() {
+      playTone(220,'sawtooth',0.18,0.15);
+      playTone(180,'sawtooth',0.18,0.15,0.1);
+      playTone(150,'sawtooth',0.2,0.12,0.22);
+    }
     // --- Wallet Connect ---
     btnConnect.onclick = async function() {
       if (!window.ethereum) { status.textContent = "Install MetaMask or Rabby"; return; }
@@ -409,13 +341,73 @@
       jackpotVal.textContent = Number(ethers.formatEther(jp)).toFixed(4);
     }
     setInterval(loadJackpot, 8000);
+    // --- Spin Packages ---
+    function updateSpinsLeft() {
+      spinsLeft.textContent = "Spins left: " + prepaidSpins;
+    }
+    async function buyPackage(spins, moons) {
+      if (!slot || !signer) {
+        status.textContent = "Connect wallet first!";
+        return;
+      }
+      if (spinning) return;
+      try {
+        status.textContent = `Buying ${spins} spins for ${moons} MON...`;
+        btnSpin.disabled = true;
+        const tx = await signer.sendTransaction({
+          to: SLOT_ADDR,
+          value: ethers.parseEther(moons.toString())
+        });
+        txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0, 10)}...</a>`;
+        await tx.wait();
+        prepaidSpins += spins;
+        updateSpinsLeft();
+        status.textContent = `Package purchased! You have ${prepaidSpins} spins.`;
+        btnSpin.disabled = false;
+        loadBalance();
+      } catch (e) {
+        status.textContent = e.reason || e.shortMessage || e.message || "TX failed";
+        btnSpin.disabled = false;
+      }
+    }
+    window.buyPackage = buyPackage; // Make available to HTML
+    updateSpinsLeft();
     // --- Spin ---
     btnSpin.onclick = async function() {
       if (!slot || spinning) return;
+      if (prepaidSpins > 0) {
+        spinning = true;
+        btnSpin.disabled = true;
+        prepaidSpins--;
+        updateSpinsLeft();
+        status.textContent = "Spinning (prepaid)...";
+        txRow.innerHTML = "";
+        soundSpin();
+        await animateReels(rand());
+        // Simulate a win/lose (random)
+        const r = Math.random();
+        if (r < 0.01) {
+          status.textContent = "JACKPOT! (prepaid)";
+          status.className = "status jackpot";
+          soundJackpot();
+        } else if (r < 0.21) {
+          status.textContent = "WIN! (prepaid)";
+          status.className = "status win";
+          soundWin();
+        } else {
+          status.textContent = "Try again! (prepaid)";
+          status.className = "status lose";
+          soundLose();
+        }
+        spinning = false;
+        btnSpin.disabled = false;
+        return;
+      }
       spinning = true;
       btnSpin.disabled = true;
       status.textContent = "Spinning...";
       txRow.innerHTML = "";
+      soundSpin();
       setReels([rand(), rand(), rand()]);
       try {
         const bet = bets[betIdx];
@@ -440,18 +432,22 @@
         if (jackpot) {
           status.textContent = "JACKPOT! +" + ethers.formatEther(payout) + " MON";
           status.className = "status jackpot";
+          soundJackpot();
         } else if (win) {
           status.textContent = "WIN! +" + ethers.formatEther(payout) + " MON";
           status.className = "status win";
+          soundWin();
         } else {
           status.textContent = "Try again!";
           status.className = "status lose";
+          soundLose();
         }
         loadBalance();
         loadJackpot();
       } catch (e) {
         status.textContent = e.reason || e.shortMessage || e.message || "TX failed";
         status.className = "status lose";
+        soundLose();
       }
       spinning = false;
       btnSpin.disabled = false;
@@ -477,32 +473,6 @@
     }
     // --- On load: show random reels ---
     setReels([rand(), rand(), rand()]);
-    // --- Paste your slot ABI below ---
-    SLOT_ABI.splice(0, SLOT_ABI.length, ...[
-      {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
-      {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},
-      {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},
-      {"inputs":[],"name":"ReentrancyGuardReentrantCall","type":"error"},
-      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
-      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rand","type":"uint256"},{"indexed":false,"internalType":"bool","name":"win","type":"bool"},{"indexed":false,"internalType":"bool","name":"jackpot","type":"bool"},{"indexed":false,"internalType":"uint256","name":"payout","type":"uint256"}],"name":"Spin","type":"event"},
-      {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"allowedBets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"allowedBetsLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"jackpotChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"jackpotFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"jackpotPool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"nftContract","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"inputs":[{"internalType":"address","name":"_nft","type":"address"}],"name":"setNFTContract","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"inputs":[{"internalType":"bool","name":"v","type":"bool"}],"name":"setPaused","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"inputs":[{"internalType":"uint256","name":"betIndex","type":"uint256"}],"name":"spin","outputs":[],"stateMutability":"payable","type":"function"},
-      {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"inputs":[],"name":"winChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"winMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
-      {"stateMutability":"payable","type":"receive"}
-    ]);
   </script>
 </body>
 </html>
