@@ -346,9 +346,9 @@ footer{position:relative;z-index:10;margin:10px 0 18px;font-size:8px;letter-spac
   .r-arr{display:none}
   .top-bar{flex-direction:column;align-items:flex-start}
   .jp-val{font-size:26px}.jp-deco{display:none}
-  .reel{height:240px}.sym{height:80px;font-size:36px}
-  .reel::before,.reel::after{height:80px}
-  .rh{top:calc(50% - 30px);height:80px}
+  .reel{height:180px}.sym{height:60px;font-size:36px}
+  .reel::before,.reel::after{height:60px}
+  .rh{top:calc(50% - 30px);height:60px}
   .bet-adj-btn{padding:8px 16px;font-size:22px}
   .bet-display{font-size:20px;min-width:120px;padding:8px 16px}
 }
@@ -663,12 +663,10 @@ async function handleChainChange(hex){
   lbl.className='net-label'+(ok?'':' wrong');
   lbl.textContent=ok?'MONAD TESTNET':'WRONG NET ('+id+')';
   document.getElementById('netBanner').className='net-banner'+(ok?'':' show');
-  if(ok&&walletAddr&&_signerReady){
-    // Reuse existing signer — just rebuild contract on new chain
+  if(ok&&walletAddr&&_signerReady&&signer){
+    // Reuse cached signer — DO NOT call getSigner() (ethers v6 triggers popup)
     const ethers=window._ethers;
-    provider=new ethers.BrowserProvider(window.ethereum);
-    // Re-get signer silently (no popup — wallet already approved)
-    try{ signer=await provider.getSigner(); contract=new ethers.Contract(SLOT_ADDR,SLOT_ABI,signer); }catch{}
+    contract=new ethers.Contract(SLOT_ADDR,SLOT_ABI,signer);
     await loadBets(); await updateJackpot(); setSpinReady();
   }else if(!ok){
     document.getElementById('btnSpin').className='btn-spin locked';
@@ -687,7 +685,7 @@ async function connectWallet(){
     // ONE-TIME approval request
     await window.ethereum.request({method:'eth_requestAccounts'});
     const ethers=await loadEthers();
-    provider=new ethers.BrowserProvider(window.ethereum);
+    provider=new ethers.BrowserProvider(window.ethereum,'any');
     const chainHex=await window.ethereum.request({method:'eth_chainId'});
     if(!isMonad(chainHex)){showToast('SWITCHING...','Adding Monad network');await switchToMonad();}
     const newChain=await window.ethereum.request({method:'eth_chainId'});
@@ -779,9 +777,11 @@ function changeBet(dir){
 
 /* ─── SPIN ─── */
 async function doSpin(){
-  if(!walletAddr||!_signerReady){connectWallet();return;}
+  if(!walletAddr||!_signerReady||!signer){connectWallet();return;}
   if(!isMonad(currentChainId)){switchToMonad();return;}
-  if(spinning||!contract)return;
+  if(spinning)return;
+  if(!contract&&signer){const _e=window._ethers;contract=new _e.Contract(SLOT_ADDR,SLOT_ABI,signer);}
+  if(!contract)return;
   soundClick();
   spinning=true;
   document.getElementById('btnSpin').className='btn-spin spinning';
@@ -970,7 +970,7 @@ loadEthers().then(async()=>{
     if(accounts&&accounts.length>0){
       // Silently restore session — no approval popup
       const ethers=window._ethers;
-      provider=new ethers.BrowserProvider(window.ethereum);
+      provider=new ethers.BrowserProvider(window.ethereum,'any');
       const chainHex=await window.ethereum.request({method:'eth_chainId'});
       currentChainId=chainHex;
       signer=await provider.getSigner(); // safe: already approved
