@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>JOKER 777 — Monad Slot Machine</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold:#ffd700; --gold2:#ffaa00; --green:#00e054; --green2:#00ff66;
+  --pink:#ff2d9b; --pink2:#ff69d4; --red:#ff4444;
+  --bg:#050505; --panel:#0a0f0a; --panel2:#0d150d;
+  --text:#e8f5e8; --dim:rgba(200,255,150,.35);
+  --fd:'Bebas Neue',sans-serif; --fm:'Share Tech Mono',monospace;
+  --neon-pink: #ff2d9b;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-shadow: 0 0 12px var(--neon-pink), 0 0 32px var(--neon-pink), 0 0 64px var(--neon-pink);
+  --neon-btn-shadow: 0 0 16px var(--neon-green), 0 0 32px var(--neon-green);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--fm);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+}
+
+/* ── SCANLINES OVERLAY ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+}
+
+/* ── RAIN ── */
+#rain{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.bill{position:absolute;animation:billFall linear infinite;opacity:0;font-size:22px;filter:drop-shadow(0 0 6px rgba(0,200,83,.6))}
+@keyframes billFall{0%{transform:translateY(-40px) rotate(0deg);opacity:0}8%{opacity:.7}92%{opacity:.3}100%{transform:translateY(105vh) rotate(360deg);opacity:0}}
+
+/* ── FLASH ── */
+#flash{position:fixed;inset:0;z-index:5000;pointer-events:none;opacity:0}
+#flash.wf{animation:fa .8s ease-out forwards;background:radial-gradient(ellipse at center,rgba(0,255,100,.25),transparent 65%)}
+#flash.jf{animation:fa 1.4s ease-out forwards;background:radial-gradient(ellipse at center,rgba(255,45,155,.35),transparent 65%)}
+@keyframes fa{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;width:100%;max-width:900px;
+  padding:40px 20px 0;display:flex;flex-direction:column;align-items:center;
+}
+.logo-wrap{display:flex;flex-direction:column;align-items:center;position:relative}
+.logo-wrap::before{
+  content:'';position:absolute;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,45,155,.15) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  animation:ringGlow 3s ease-in-out infinite;pointer-events:none;
+}
+@keyframes ringGlow{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Joker SVG logo inline */
+.joker-logo{
+  width:150px;height:150px;
+  filter:drop-shadow(0 0 18px #ff2d9b) drop-shadow(0 0 40px rgba(255,45,155,.4));
+  animation:logoP 2.8s ease-in-out infinite;
+}
+@keyframes logoP{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+
+.logo-name{
+  font-family:var(--fd);font-size:clamp(52px,10vw,108px);font-weight:900;
+  letter-spacing:6px;line-height:1;text-align:center;
+  background:linear-gradient(180deg,#fff0f5 0%,#ff69d4 20%,#ff2d9b 45%,#cc0066 70%,#880033 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 24px rgba(255,45,155,.8));
+  animation:nameP 3s ease-in-out infinite;margin-top:-4px;
+}
+@keyframes nameP{0%,100%{filter:drop-shadow(0 0 24px rgba(255,45,155,.8))}50%{filter:drop-shadow(0 0 50px #ff2d9b) drop-shadow(0 0 80px rgba(255,100,0,.5))}}
+
+.logo-777{
+  font-family:var(--fd);font-size:clamp(40px,8vw,88px);letter-spacing:10px;
+  background:linear-gradient(180deg,#fff5dc 0%,#ffd700 30%,#ff8c00 65%,#cc3300 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(255,140,0,.9));
+  animation:sevP 3s ease-in-out infinite .5s;margin-top:-8px;
+}
+@keyframes sevP{0%,100%{filter:drop-shadow(0 0 20px rgba(255,140,0,.9))}50%{filter:drop-shadow(0 0 40px #ffd700) drop-shadow(0 0 70px rgba(255,80,0,.6))}}
+
+.green-line{
+  width:220px;height:3px;margin-top:6px;
+  background:linear-gradient(90deg,transparent,#39ff14,transparent);
+  box-shadow:0 0 12px #39ff14,0 0 24px rgba(57,255,20,.4);
+  animation:lineP 2s ease-in-out infinite;
+}
+@keyframes lineP{0%,100%{opacity:.6}50%{opacity:1}}
+
+.tagline{font-size:9px;letter-spacing:8px;color:rgba(57,255,20,.5);margin-top:6px;text-transform:uppercase}
+
+/* ── TOP BAR ── */
+.top-bar{
+  position:relative;z-index:10;width:100%;max-width:900px;
+  padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+}
+.net-row{display:flex;align-items:center;gap:10px}
+.net-dot{width:9px;height:9px;border-radius:50%;background:#1a2a1a;border:1px solid rgba(57,255,20,.2);transition:all .3s;flex-shrink:0}
+.net-dot.on{background:var(--green2);box-shadow:0 0 10px var(--green2);animation:dotP 2s ease-in-out infinite}
+@keyframes dotP{0%,100%{opacity:1}50%{opacity:.4}}
+.net-label{font-size:10px;letter-spacing:3px;color:rgba(57,255,20,.6)}
+
+.wallet-area{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.w-addr{font-size:10px;color:rgba(255,45,155,.5);letter-spacing:1px}
+.w-bal{font-size:11px;color:var(--green2);background:rgba(0,255,100,.06);border:1px solid rgba(0,255,100,.2);padding:4px 10px;display:none}
+
+/* Neon Button Styles */
+.btn-connect, .btn-spin, .bet-btn {
+  font-family:var(--fd);
+  border-radius: 6px;
+  box-shadow: var(--neon-btn-shadow);
+  transition: box-shadow 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+  outline: none;
+}
+.btn-connect{
+  font-size:12px;letter-spacing:3px;padding:10px 24px;
+  background:transparent;border:2px solid var(--pink);color:var(--pink);
+  cursor:pointer;position:relative;overflow:hidden;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  text-shadow:0 0 8px currentColor;
+}
+.btn-connect:focus, .btn-spin:focus, .bet-btn:focus {
+  outline: 2px solid var(--neon-green);
+  box-shadow: 0 0 0 4px var(--neon-green), var(--neon-btn-shadow);
+}
+.btn-connect:hover, .btn-spin.ready:hover, .bet-btn:hover {
+  box-shadow: 0 0 32px var(--neon-pink), 0 0 64px var(--neon-pink);
+  background: linear-gradient(90deg, var(--neon-pink) 0%, var(--neon-gold) 100%);
+  color: #fff;
+}
+.btn-connect.on, .btn-spin.ready {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: linear-gradient(90deg, #111, var(--neon-green) 80%);
+  box-shadow: 0 0 32px var(--neon-green), 0 0 64px var(--neon-green);
+}
+.btn-spin.spinning {
+  background: linear-gradient(90deg, var(--neon-gold), #ff8c00 80%);
+  color: #000;
+  box-shadow: 0 0 32px var(--neon-gold), 0 0 64px var(--neon-gold);
+}
+.bet-btn.active {
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-gold));
+  color: #fff;
+  box-shadow: 0 0 24px var(--neon-pink);
+}
+.btn-connect:disabled, .btn-spin:disabled, .bet-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* ── MACHINE ── */
+.machine-shell{position:relative;z-index:10;width:100%;max-width:820px;margin:0 16px}
+.machine-frame{
+  background:linear-gradient(135deg,rgba(255,45,155,.1) 0%,rgba(255,140,0,.04) 40%,rgba(0,200,83,.05) 60%,rgba(255,45,155,.1) 100%);
+  border:1px solid rgba(255,45,155,.3);
+  box-shadow:0 0 0 1px rgba(255,45,155,.06),0 0 50px rgba(255,45,155,.1),0 0 100px rgba(255,45,155,.04),inset 0 0 80px rgba(0,0,0,.9);
+  padding:3px;
+}
+.machine-body{background:var(--panel);border:1px solid rgba(255,45,155,.1);padding:28px 24px 24px;position:relative}
+
+/* corners */
+.crn{position:absolute;width:28px;height:28px}
+.crn::before,.crn::after{content:'';position:absolute;background:var(--pink);box-shadow:0 0 6px rgba(255,45,155,.5)}
+.crn.tl::before{top:0;left:0;width:100%;height:2px}.crn.tl::after{top:0;left:0;width:2px;height:100%}
+.crn.tr::before{top:0;right:0;width:100%;height:2px}.crn.tr::after{top:0;right:0;width:2px;height:100%}
+.crn.bl::before{bottom:0;left:0;width:100%;height:2px}.crn.bl::after{bottom:0;left:0;width:2px;height:100%}
+.crn.br::before{bottom:0;right:0;width:100%;height:2px}.crn.br::after{bottom:0;right:0;width:2px;height:100%}
+.crn.tl{top:8px;left:8px}.crn.tr{top:8px;right:8px}.crn.bl{bottom:8px;left:8px}.crn.br{bottom:8px;right:8px}
+
+/* ... (rest of your CSS unchanged, keep all your original styles below this line) ... */
+
+/* ── JACKPOT ── */
+.jp-panel{
+  background:linear-gradient(135deg,#020305,#050210);
+  border:1px solid rgba(255,45,155,.25);padding:16px 22px;margin-bottom:22px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  position:relative;overflow:hidden;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.8),0 0 20px rgba(255,45,155,.06);
+}
+.jp-panel::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,45,155,.04),transparent);
+  animation:jpS 2.5s linear infinite;
+}
+@keyframes jpS{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.jp-deco{font-size:30px;animation:decoF 3s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,45,155,.6))}
+.jp-deco:last-child{animation-delay:1.5s}
+@keyframes decoF{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.jp-center{display:flex;flex-direction:column;align-items:center;gap:2px}
+.jp-label{font-size:9px;letter-spacing:6px;color:rgba(255,45,155,.5);text-transform:uppercase}
+.jp-val{
+  font-family:var(--fd);font-size:42px;letter-spacing:3px;color:var(--pink);
+  text-shadow:0 0 16px rgba(255,45,155,.9),0 0 40px rgba(255,45,155,.4);
+  animation:jpGlow 4s ease-in-out infinite;line-height:1;
+}
+@keyframes jpGlow{0%,100%{text-shadow:0 0 16px rgba(255,45,155,.9),0 0 40px rgba(255,45,155,.4)}50%{text-shadow:0 0 30px #ff2d9b,0 0 70px rgba(255,100,0,.5)}}
+
+/* ... (keep all your original CSS below this line) ... */
+
+@media(max-width:620px){
+  .bottom{grid-template-columns:1fr}
+  .btn-spin{font-size:20px;letter-spacing:5px;min-width:220px;padding:18px 48px}
+  .logo-name{font-size:52px}.logo-777{font-size:44px}
+  .joker-logo{width:110px;height:110px}
+  .r-arr{display:none}
+  .top-bar{flex-direction:column;align-items:flex-start}
+  .jp-val{font-size:28px}.jp-deco{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="rain"></div>
+<div id="flash"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <!-- Inline Joker SVG matching the logo -->
+    <svg class="joker-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="neonF"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <g transform="translate(100,110)" filter="url(#neonF)">
+        <path d="M-55,-95 L-38,-38 L-22,-58 Z" fill="none" stroke="#ff2d9b" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M55,-95 L38,-38 L22,-58 Z" fill="none" stroke="#ff2d9b" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M0,-105 L-16,-50 L16,-50 Z" fill="none" stroke="#ff2d9b" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M-58,-32 Q-68,18 -50,52 Q-26,86 0,86 Q26,86 50,52 Q68,18 58,-32 Q34,-58 0,-58 Q-34,-58 -58,-32 Z" fill="none" stroke="#ff69d4" stroke-width="4"/>
+        <path d="M-30,-8 L-20,-20 L-10,-8" fill="none" stroke="#ff2d9b" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M10,-8 L20,-20 L30,-8" fill="none" stroke="#ff2d9b" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M-7,12 L0,2 L7,12 L0,17 Z" fill="none" stroke="#ff69d4" stroke-width="2.5"/>
+        <path d="M-26,38 Q-12,52 0,47 Q12,52 26,38" fill="none" stroke="#ff2d9b" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <div class="logo-name">JOKER</div>
+    <div class="logo-777">777</div>
+    <div class="green-line"></div>
+    <div class="tagline">◈ monad slot machine ◈</div>
+  </div>
+</header>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="net-row">
+    <div class="net-dot" id="netDot"></div>
+    <span class="net-label" id="netLabel">MONAD TESTNET</span>
+  </div>
+  <div class="wallet-area">
+    <span class="w-addr" id="wAddr"></span>
+    <span class="w-bal" id="wBal"></span>
+    <button class="btn-connect" id="btnConnect" onclick="connectWallet()" tabindex="0"><span id="connLabel">CONNECT WALLET</span></button>
+  </div>
+</div>
+
+<!-- MACHINE -->
+<div class="machine-shell">
+  <div class="machine-frame">
+    <div class="machine-body">
+      <div class="crn tl"></div><div class="crn tr"></div>
+      <div class="crn bl"></div><div class="crn br"></div>
+
+      <!-- JACKPOT -->
+      <div class="jp-panel">
+        <div class="jp-deco">🃏</div>
+        <div class="jp-center">
+          <div class="jp-label">◈ jackpot pool ◈</div>
+          <div class="jp-val" id="jpVal">0.0000 MON</div>
+        </div>
+        <div class="jp-deco">💎</div>
+      </div>
+
+      <!-- REELS -->
+      <div class="reels-container">
+        <div class="r-arr l">◂</div>
+        <div class="r-arr r">▸</div>
+        <div class="reels-row">
+          <div class="reel"><div class="rh"></div><div class="rs" id="r0"></div></div>
+          <div class="reel"><div class="rh"></div><div class="rs" id="r1"></div></div>
+          <div class="reel"><div class="rh"></div><div class="rs" id="r2"></div></div>
+        </div>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+        <div class="bet-section">
+          <span class="bet-label">BET SIZE</span>
+          <div id="betBtns" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"></div>
+        </div>
+
+        <div class="info-row">
+          WIN <span class="v">20%</span>
+          <span class="s">|</span>
+          JACKPOT <span class="v">1%</span>
+          <span class="s">|</span>
+          MULTIPLIER <span class="v">2×</span>
+        </div>
+
+        <div class="spin-wrap" id="spinWrap">
+          <div class="spin-ring"></div>
+          <button class="btn-spin locked" id="btnSpin" onclick="doSpin()" tabindex="0" disabled>
+            <div class="btn-txt">
+              <span class="btn-ico" id="btnIcoL">🔒</span>
+              <span id="btnLabel">CONNECT WALLET</span>
+              <span class="btn-ico" id="btnIcoR">🔒</span>
+              <div class="spin-dots" id="spinDots" style="display:none"><span></span><span></span><span></span></div>
+            </div>
+          </button>
+          <div class="btn-status locked" id="btnStatus">WALLET NOT CONNECTED</div>
+        </div>
+
+        <div class="result-msg" id="resMsg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYTABLE -->
+<div class="paytable">
+  <div class="pi"><span class="pe">🃏</span> JACKPOT <span class="pm">FULL POOL</span></div>
+  <div class="pi"><span class="pe">🟢</span> WIN <span class="pm">2× BET</span></div>
+  <div class="pi"><span class="pe">🎴</span> WIN NFT <span class="pm">AUTO MINT</span></div>
+  <div class="pi"><span class="pe">💎</span> CHANCE <span class="pm">20% / 1%</span></div>
+</div>
+
+<!-- NFT BADGE -->
+<div class="nft-badge" id="nftBadge">
+  <div class="nft-ico">🏆</div>
+  <div class="nft-info">
+    <div class="nft-title" id="nftTitle">NFT MINTED!</div>
+    <div class="nft-sub" id="nftSub">Prize NFT sent to your wallet</div>
+  </div>
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom">
+  <div class="stats">
+    <div class="stat"><div class="sl">SPINS</div><div class="sv" id="stSpins">0</div></div>
+    <div class="stat"><div class="sl">WINS</div><div class="sv hi" id="stWins">0</div></div>
+    <div class="stat"><div class="sl">TOTAL BET</div><div class="sv" id="stBet">0.00</div></div>
+    <div class="stat"><div class="sl">TOTAL WON</div><div class="sv gi" id="stWon">0.00</div></div>
+  </div>
+  <div class="log">
+    <div class="lh">SPIN LOG</div>
+    <div class="ll" id="logList"></div>
+  </div>
+</div>
+
+<footer>JOKER777 · MONAD CHAIN · CONTRACT 0xE538...968</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="ti" id="toastTitle">—</div>
+  <div class="tb" id="toastBody">—</div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// CONTRACT CONFIG
+// ══════════════════════════════════════
+const SLOT_ADDR   = '0xE538Abc2a84e51b68d7EE84d8b10E3DF8F9Cf968';
+const MONAD_CHAIN = '0x8F'; // 143 decimal
+
+const SLOT_ABI = [
+  'function spin(uint256 betIndex) payable',
+  'function jackpotPool() view returns (uint256)',
+  'function allowedBetsLength() view returns (uint256)',
+  'function allowedBets(uint256) view returns (uint256)',
+  'function paused() view returns (bool)',
+  'event Spin(address indexed player, uint256 bet, uint256 rand, bool win, bool jackpot, uint256 payout, uint256 nftTokenId, uint256 colorId)'
+];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let provider, signer, contract;
+let walletAddr = null;
+let selectedBet = 0;
+let spinning = false;
+let bets = [];
+let stats = { spins:0, wins:0, bet:0, won:0 };
+
+// ══════════════════════════════════════
+// SYMBOLS
+// ══════════════════════════════════════
+const SYMS = ['🃏','7️⃣','💎','🔥','⭐','🎴','💰','🎰'];
+const WIN_SYMS  = ['7️⃣','7️⃣','7️⃣'];
+const JP_SYMS   = ['🃏','🃏','🃏'];
+const LOSE_SYMS = [
+  ['🎴','💎','🔥'],['⭐','🎰','🃏'],['💰','7️⃣','⭐'],
+  ['🔥','🎴','💰'],['💎','⭐','🎰'],['🎰','💰','🎴']
+];
+
+// ══════════════════════════════════════
+// INIT REELS
+// ══════════════════════════════════════
+function buildReels() {
+  for (let i = 0; i < 3; i++) {
+    const rs = document.getElementById('r' + i);
+    rs.innerHTML = '';
+    for (let j = 0; j < 12; j++) {
+      const d = document.createElement('div');
+      d.className = 'sym';
+      d.textContent = SYMS[Math.floor(Math.random() * SYMS.length)];
+      rs.appendChild(d);
+    }
+  }
+}
+
+function animReel(idx, finalSym, dur) {
+  return new Promise(resolve => {
+    const el = document.getElementById('r' + idx);
+    const syms = el.querySelectorAll('.sym');
+    const mid = Math.floor(syms.length / 2);
+    let tick = 0;
+    const iv = setInterval(() => {
+      for (let i = 0; i < syms.length; i++) {
+        if (i === mid) continue; // Only update non-final
+        syms[i].textContent = SYMS[Math.floor(Math.random() * SYMS.length)];
+      }
+      tick++;
+    }, 60);
+    setTimeout(() => {
+      clearInterval(iv);
+      syms[mid].textContent = finalSym;
+      resolve();
+    }, dur);
+  });
+}
+
+async function animateReels(s0, s1, s2) {
+  const base = 600;
+  await Promise.all([
+    animReel(0, s0, base),
+    animReel(1, s1, base + 220),
+    animReel(2, s2, base + 440)
+  ]);
+}
+
+// ══════════════════════════════════════
+// WALLET
+// ══════════════════════════════════════
+async function connectWallet() {
+  const btn = document.getElementById('btnConnect');
+  btn.disabled = true;
+  btn.innerHTML = '<span id="connLabel">CONNECTING...</span>';
+  try {
+    if (!window.ethereum) {
+      showToast('NO WALLET', 'Install MetaMask or a Web3 wallet');
+      btn.disabled = false;
+      btn.innerHTML = '<span id="connLabel">CONNECT WALLET</span>';
+      return;
+    }
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const ethers = await loadEthers();
+    provider = new ethers.BrowserProvider(window.ethereum);
+
+    // Switch to Monad
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_CHAIN }] });
+    } catch(e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+          chainId: MONAD_CHAIN,
+          chainName: 'Monad Testnet',
+          nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
+          rpcUrls: ['https://rpc.monad.xyz'],
+          blockExplorerUrls: ['https://explorer.monad.xyz']
+        }]});
+      }
+    }
+
+    signer = await provider.getSigner();
+    walletAddr = await signer.getAddress();
+    contract = new ethers.Contract(SLOT_ADDR, SLOT_ABI, signer);
+
+    updateWalletUI();
+    await loadBets();
+    await updateJackpot();
+    startJackpotPoll();
+    listenSpinEvents();
+
+    showToast('CONNECTED', shortAddr(walletAddr));
+  } catch(e) {
+    showToast('ERROR', e.message?.slice(0,60) || 'Connection failed');
+  }
+  btn.disabled = false;
+  btn.innerHTML = `<span id="connLabel">${walletAddr ? shortAddr(walletAddr) : 'CONNECT WALLET'}</span>`;
+}
+
+function updateWalletUI() {
+  document.getElementById('connLabel').textContent = shortAddr(walletAddr);
+  document.getElementById('btnConnect').classList.add('on');
+  document.getElementById('wAddr').textContent = shortAddr(walletAddr);
+  document.getElementById('netDot').classList.add('on');
+
+  // Update balance
+  provider.getBalance(walletAddr).then(b => {
+    const ethers = window._ethers;
+    const bal = parseFloat(ethers.formatEther(b)).toFixed(4);
+    const wBal = document.getElementById('wBal');
+    wBal.textContent = bal + ' MON';
+    wBal.style.display = 'block';
+  });
+
+  setSpinReady();
+}
+
+function setSpinReady() {
+  const btn = document.getElementById('btnSpin');
+  const wrap = document.getElementById('spinWrap');
+  const status = document.getElementById('btnStatus');
+  btn.className = 'btn-spin ready';
+  btn.disabled = false;
+  wrap.className = 'spin-wrap ready';
+  status.className = 'btn-status ready';
+  status.textContent = 'READY TO SPIN';
+  document.getElementById('btnIcoL').textContent = '🃏';
+  document.getElementById('btnIcoR').textContent = '🃏';
+  document.getElementById('btnLabel').textContent = 'SPIN';
+  document.getElementById('spinDots').style.display = 'none';
+}
+
+async function loadBets() {
+  try {
+    const ethers = window._ethers;
+    const len = await contract.allowedBetsLength();
+    bets = [];
+    for (let i = 0; i < Number(len); i++) {
+      const b = await contract.allowedBets(i);
+      bets.push({ index: i, value: b, label: parseFloat(ethers.formatEther(b)).toString() + ' MON' });
+    }
+    buildBetButtons();
+  } catch(e) { console.error('loadBets', e); }
+}
+
+function buildBetButtons() {
+  const container = document.getElementById('betBtns');
+  container.innerHTML = '';
+  bets.forEach((b, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'bet-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = b.label;
+    btn.tabIndex = 0;
+    btn.onclick = () => {
+      selectedBet = i;
+      document.querySelectorAll('.bet-btn').forEach((el, j) => {
+        el.classList.toggle('active', j === i);
+      });
+    };
+    container.appendChild(btn);
+  });
+  selectedBet = 0;
+}
+
+// ══════════════════════════════════════
+// SPIN
+// ══════════════════════════════════════
+async function doSpin() {
+  if (!walletAddr) { connectWallet(); return; }
+  if (spinning) return;
+  if (!contract) return;
+
+  spinning = true;
+  setSpinSpinning(true);
+
+  try {
+    const ethers = window._ethers;
+    const betVal = bets[selectedBet]?.value;
+    if (!betVal) throw new Error('No bet selected');
+
+    const tx = await contract.spin(selectedBet, { value: betVal });
+    showToast('TX SENT', 'Waiting for confirmation...');
+
+    const receipt = await tx.wait();
+
+    // Parse Spin event
+    let isWin = false, isJackpot = false, payout = 0n, colorId = 0n;
+    for (const log of receipt.logs) {
+      try {
+        const iface = new ethers.Interface(SLOT_ABI);
+        const parsed = iface.parseLog(log);
+        if (parsed?.name === 'Spin') {
+          isWin     = parsed.args.win;
+          isJackpot = parsed.args.jackpot;
+          payout    = parsed.args.payout;
+          colorId   = parsed.args.colorId;
+          break;
+        }
+      } catch {}
+    }
+
+    // Animate reels
+    let s0, s1, s2;
+    if (isJackpot) {
+      [s0,s1,s2] = JP_SYMS;
+    } else if (isWin) {
+      [s0,s1,s2] = WIN_SYMS;
+    } else {
+      const row = LOSE_SYMS[Math.floor(Math.random() * LOSE_SYMS.length)];
+      [s0,s1,s2] = row;
+    }
+    await animateReels(s0, s1, s2);
+
+    // Result
+    const payoutMon = parseFloat(ethers.formatEther(payout)).toFixed(4);
+
+    if (isJackpot) {
+      showResult('🃏 JACKPOT! +' + payoutMon + ' MON', 'jw');
+      flashScreen('jf');
+      startRain(20);
+      if (Number(colorId) > 0) showNFTBadge('JACKPOT NFT', 'Rare prize NFT minted! 🏆');
+    } else if (isWin) {
+      showResult('✨ WIN! +' + payoutMon + ' MON', 'win');
+      flashScreen('wf');
+      startRain(8);
+      if (Number(colorId) > 0) showNFTBadge('WINNER NFT', 'Prize NFT minted to your wallet');
+    } else {
+      showResult('◈ NO WIN ◈', 'lose');
+    }
+
+    // Stats
+    stats.spins++;
+    if (isWin || isJackpot) stats.wins++;
+    stats.bet += parseFloat(ethers.formatEther(betVal));
+    if (isWin || isJackpot) stats.won += parseFloat(ethers.formatEther(payout));
+    updateStats();
+
+    // Log
+    addLog(isJackpot ? 'JACKPOT' : isWin ? 'WIN' : 'LOSE',
+           isJackpot || isWin ? '+' + payoutMon : '-' + parseFloat(ethers.formatEther(betVal)).toFixed(4),
+           isJackpot ? 'lj' : isWin ? 'lw' : 'll2');
+
+    // Update jackpot
+    await updateJackpot();
+    // Update balance
+    provider.getBalance(walletAddr).then(b => {
+      document.getElementById('wBal').textContent = parseFloat(ethers.formatEther(b)).toFixed(4) + ' MON';
+    });
+
+  } catch(e) {
+    console.error(e);
+    let msg = e.reason || e.shortMessage || e.message || 'Transaction failed';
+    if (msg.includes('Insufficient pool')) msg = 'Contract needs funding';
+    if (msg.includes('user rejected')) msg = 'Transaction rejected';
+    showResult('TX FAILED', 'lose');
+    showToast('ERROR', msg.slice(0, 60));
+  }
+
+  spinning = false;
+  setSpinSpinning(false);
+}
+
+function setSpinSpinning(isSpinning) {
+  const btn = document.getElementById('btnSpin');
+  btn.disabled = isSpinning;
+  btn.className = isSpinning ? 'btn-spin spinning' : 'btn-spin ready';
+  document.getElementById('spinDots').style.display = isSpinning ? 'flex' : 'none';
+  document.getElementById('btnLabel').textContent = isSpinning ? '' : 'SPIN';
+  document.getElementById('btnIcoL').textContent = isSpinning ? '' : '🃏';
+  document.getElementById('btnIcoR').textContent = isSpinning ? '' : '🃏';
+}
+
+// ══════════════════════════════════════
+// JACKPOT POLL
+// ══════════════════════════════════════
+async function updateJackpot() {
+  try {
+    const ethers = window._ethers;
+    const jp = await contract.jackpotPool();
+    const val = parseFloat(ethers.formatEther(jp)).toFixed(4);
+    document.getElementById('jpVal').textContent = val + ' MON';
+  } catch {}
+}
+
+function startJackpotPoll() {
+  setInterval(updateJackpot, 8000);
+}
+
+// ══════════════════════════════════════
+// EVENTS
+// ══════════════════════════════════════
+function listenSpinEvents() {
+  try {
+    const ethers = window._ethers;
+    contract.on('Spin', (player, bet, rand, win, jackpot, payout, nftId, colorId) => {
+      if (player.toLowerCase() !== walletAddr.toLowerCase()) {
+        const p = parseFloat(ethers.formatEther(payout)).toFixed(4);
+        if (jackpot || win) addLog(jackpot?'JACKPOT':'WIN', '+'+p, jackpot?'lj':'lw');
+      }
+    });
+  } catch {}
+}
+
+// ══════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════
+function showResult(msg, cls) {
+  const el = document.getElementById('resMsg');
+  el.textContent = msg;
+  el.className = 'result-msg show ' + cls;
+  setTimeout(() => { el.className = 'result-msg'; }, 4000);
+}
+
+function flashScreen(cls) {
+  const f = document.getElementById('flash');
+  f.className = '';
+  void f.offsetWidth;
+  f.className = cls;
+}
+
+function startRain(count) {
+  const rain = document.getElementById('rain');
+  for (let i = 0; i < count; i++) {
+    const b = document.createElement('div');
+    b.className = 'bill';
+    b.textContent = ['💰','🃏','💎','7️⃣','✨'][Math.floor(Math.random()*5)];
+    b.style.left = Math.random() * 100 + 'vw';
+    b.style.animationDuration = (2 + Math.random() * 2) + 's';
+    b.style.animationDelay = (Math.random() * 1) + 's';
+    rain.appendChild(b);
+    setTimeout(() => b.remove(), 5000);
+  }
+}
+
+function showNFTBadge(title, sub) {
+  const badge = document.getElementById('nftBadge');
+  document.getElementById('nftTitle').textContent = title;
+  document.getElementById('nftSub').textContent = sub;
+  badge.className = 'nft-badge show';
+  setTimeout(() => { badge.className = 'nft-badge'; }, 6000);
+}
+
+function addLog(result, amount, cls) {
+  const list = document.getElementById('logList');
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const le = document.createElement('div');
+  le.className = 'le ' + cls;
+  le.innerHTML = `<span class="lt">${time}</span><span class="lr">${result}</span><span class="la">${amount} MON</span>`;
+  list.insertBefore(le, list.firstChild);
+  while (list.children.length > 10) list.removeChild(list.lastChild);
+}
+
+function updateStats() {
+  document.getElementById('stSpins').textContent = stats.spins;
+  document.getElementById('stWins').textContent = stats.wins;
+  document.getElementById('stBet').textContent = stats.bet.toFixed(3);
+  document.getElementById('stWon').textContent = stats.won.toFixed(3);
+}
+
+function showToast(title, body) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastBody').textContent = body;
+  t.className = 'toast show';
+  clearTimeout(t._to);
+  t._to = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+function shortAddr(a) {
+  return a ? a.slice(0,6) + '...' + a.slice(-4) : '';
+}
+
+// ══════════════════════════════════════
+// LOAD ETHERS v6
+// ══════════════════════════════════════
+function loadEthers() {
+  return new Promise((resolve, reject) => {
+    if (window._ethers) { resolve(window._ethers); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js';
+    s.onload = () => { window._ethers = window.ethers; resolve(window.ethers); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ══════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════
+buildReels();
+loadEthers().then(() => {
+  if (window.ethereum?.selectedAddress) connectWallet();
+});
+</script>
+</body>
+</html>
