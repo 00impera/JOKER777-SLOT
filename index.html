@@ -7,81 +7,83 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0a;
-      --neon: #bf00ff;
-      --blue: #00ffff;
-      --gold: #ffd700;
-      --text: #e0ffe8;
-      --lose: #ff3333;
-      --win: #bf00ff;
-      --jackpot: #00ffff;
+      --bg: #0a0a0a; --neon: #bf00ff; --blue: #00ffff;
+      --gold: #ffd700; --text: #e0ffe8; --lose: #ff3333;
+      --win: #bf00ff; --jackpot: #00ffff;
     }
-    body { background: var(--bg); color: var(--text); font-family: 'Bebas Neue', sans-serif; margin: 0; padding: 0; min-height: 100vh; }
+    * { box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Bebas Neue', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+
+    /* GAME BANNER */
+    .banner-wrap { max-width: 900px; margin: 24px auto 0; padding: 0 12px; }
+    .banner-wrap img { width: 100%; border-radius: 16px; box-shadow: 0 0 40px #ff2d9b55, 0 0 80px #bf00ff22; display: block; }
+
     .container {
-      max-width: 900px; margin: 60px auto 0;
+      max-width: 900px; margin: 24px auto 0;
       background: linear-gradient(135deg, #0a0a0a 80%, #bf00ff10 100%);
-      border: 4px solid var(--gold); border-radius: 48px; padding: 64px 32px 48px;
+      border: 4px solid var(--gold); border-radius: 48px; padding: 48px 32px 48px;
       box-shadow: 0 0 128px #bf00ff15, 0 0 0 12px #00ffff30 inset;
     }
     h1 {
       font-size: 3em; letter-spacing: 10px;
       background: linear-gradient(90deg, #ff0080, #ffd700, #bf00ff, #00ffff, #ff0080);
-      background-size: 300% 100%;
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: titleRainbow 3s linear infinite;
-      margin: 0 0 8px 0; text-align: center;
-      text-shadow: none;
+      background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: titleRainbow 3s linear infinite; margin: 0 0 8px 0; text-align: center;
       filter: drop-shadow(0 0 18px #ffd700cc);
     }
-    @keyframes titleRainbow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
+    @keyframes titleRainbow { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
     .brand {
       font-size: 1.2em; text-align: center; margin-bottom: 18px; letter-spacing: 3px;
       background: linear-gradient(90deg, #ffd700, #ff0080, #00ffff, #ffd700);
-      background-size: 300% 100%;
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       animation: brandShift 4s linear infinite;
     }
-    @keyframes brandShift {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-    .wallet-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 18px; }
+    @keyframes brandShift { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
+
+    /* WALLET */
+    .wallet-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
     .wallet-btn {
-      background: linear-gradient(90deg, #00cc44, #009933);
-      color: #000; font-size: 1.1em; border: 2px solid #00ff66; border-radius: 32px;
-      padding: 10px 28px; cursor: pointer; font-family: inherit; font-weight: bold;
-      display: flex; align-items: center; gap: 10px;
-      transition: background 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 18px #00ff6644, 0 2px 8px #000;
+      background: linear-gradient(90deg, #00cc44, #009933); color: #000; font-size: 1.1em;
+      border: 2px solid #00ff66; border-radius: 32px; padding: 10px 28px; cursor: pointer;
+      font-family: inherit; font-weight: bold; display: flex; align-items: center; gap: 10px;
+      transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 0 18px #00ff6644, 0 2px 8px #000;
     }
-    .wallet-btn:hover {
-      background: linear-gradient(90deg, #00ff66, #00cc44);
-      box-shadow: 0 0 32px #00ff6688, 0 2px 8px #000;
-    }
-    .wallet-btn.connected {
-      background: linear-gradient(90deg, #000, #111);
-      color: #00ff66; border: 2px solid #00ff66;
-      box-shadow: 0 0 18px #00ff6644;
-      cursor: default;
-    }
+    .wallet-btn:hover { background: linear-gradient(90deg,#00ff66,#00cc44); box-shadow: 0 0 32px #00ff6688, 0 2px 8px #000; }
+    .wallet-btn.connected { background: linear-gradient(90deg,#000,#111); color: #00ff66; border: 2px solid #00ff66; box-shadow: 0 0 18px #00ff6644; cursor: default; }
     .wallet-logo { width: 24px; height: 24px; border-radius: 50%; }
     .wallet-addr { color: var(--gold); font-size: 1em; }
-    .wallet-bal { color: var(--neon); font-size: 1em; margin-left: 8px; }
+    .wallet-bal { color: #00ff66; font-size: 1em; margin-left: 4px; }
+
+    /* NETWORK WARNING - FIXED: shown ABOVE everything, not below spin */
+    .network-bar {
+      display: none; background: rgba(255,50,50,0.12); border: 2px solid #ff3333;
+      border-radius: 16px; padding: 12px 20px; margin-bottom: 16px; text-align: center;
+    }
+    .network-bar.show { display: block; }
+    .network-bar p { color: #ff6666; margin: 0 0 10px 0; font-size: 1.05em; letter-spacing: 1px; }
+    .switch-network-btn {
+      background: linear-gradient(90deg, #ff3333, #cc0000); color: #fff; border: none;
+      border-radius: 24px; padding: 10px 28px; font-size: 1.1em; font-family: inherit;
+      font-weight: bold; cursor: pointer; box-shadow: 0 0 18px #ff333355;
+      transition: box-shadow 0.2s, background 0.2s; letter-spacing: 1px;
+    }
+    .switch-network-btn:hover { background: linear-gradient(90deg,#ff5555,#ff2222); box-shadow: 0 0 32px #ff333388; }
+    .switch-network-btn:active { background: #990000; }
+
+    /* JACKPOT */
     .jackpot {
       background: rgba(191,0,255,0.07); border: 1px solid var(--neon);
       border-radius: 16px; text-align: center; padding: 10px 0; margin-bottom: 18px; font-size: 1.2em;
+      animation: jackpotPulse 2.5s ease-in-out infinite;
     }
+    @keyframes jackpotPulse { 0%,100%{box-shadow:0 0 8px #bf00ff33;} 50%{box-shadow:0 0 28px #bf00ffaa;} }
     .jackpot .val { color: var(--gold); font-size: 1.3em; font-weight: bold; }
-    .slot-frame {
-      background: linear-gradient(180deg,#222 60%,#111 100%); border-radius: 40px;
-      padding: 24px 0 32px 0; box-shadow: 0 0 32px #bf00ff15; margin-bottom: 24px;
-    }
+
+    /* SLOT */
+    .slot-frame { background: linear-gradient(180deg,#222 60%,#111 100%); border-radius: 40px; padding: 24px 0 32px 0; box-shadow: 0 0 32px #bf00ff15; margin-bottom: 24px; }
     .reels {
-      display: flex; justify-content: center; gap: 64px; margin: 64px 0 32px 0;
-      background: linear-gradient(90deg, #222 0%, #333 100%); border-radius: 32px; padding: 32px 0;
+      display: flex; justify-content: center; gap: 64px; margin: 48px 0 32px 0;
+      background: linear-gradient(90deg,#222 0%,#333 100%); border-radius: 32px; padding: 32px 0;
       box-shadow: 0 8px 32px #bf00ff30, 0 0 0 8px var(--gold) inset;
     }
     .reel {
@@ -89,105 +91,182 @@
       display: flex; align-items: center; justify-content: center; font-size: 7em;
       box-shadow: 0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset;
       border: 5px solid var(--gold); user-select: none;
-      transition: box-shadow 0.2s, border 0.2s; position: relative;
+      transition: box-shadow 0.2s, border 0.2s; position: relative; overflow: hidden;
     }
-    .reel:after {
-      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 35%;
-      background: linear-gradient(180deg,rgba(255,255,255,0.18),transparent);
-      border-radius: 32px 32px 0 0; pointer-events: none;
-    }
+    .reel:after { content:""; position:absolute; left:0; right:0; top:0; height:35%; background:linear-gradient(180deg,rgba(255,255,255,0.18),transparent); border-radius:32px 32px 0 0; pointer-events:none; }
+
+    /* BETS */
     .bet-row { text-align: center; margin-bottom: 12px; }
-    .bet-btn {
-      background: #222; color: #fff; border: none; border-radius: 10px;
-      padding: 6px 16px; margin: 0 2px; font-size: 1.1em; cursor: pointer;
-      font-family: inherit; transition: background 0.2s;
-    }
-    .bet-btn.active { background: var(--gold); color: #000; }
+    .bet-btn { background: #222; color: #fff; border: 1px solid #444; border-radius: 10px; padding: 6px 16px; margin: 0 2px; font-size: 1.1em; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .bet-btn:hover { border-color: var(--gold); }
+    .bet-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    /* SPIN BTN */
     .spin-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-      background: rgba(0, 255, 100, 0.10);
-      color: #00ff66; font-size: 1.5em; font-family: inherit;
-      border: 2px solid #00ff66; border-radius: 32px; padding: 16px 48px;
-      cursor: pointer; margin: 10px 0 0 0;
-      box-shadow: 0 0 24px #00ff6633, inset 0 0 20px rgba(0,255,100,0.06);
-      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      backdrop-filter: blur(4px);
-      letter-spacing: 4px;
+      background: rgba(0,255,100,0.10); color: #00ff66; font-size: 1.5em; font-family: inherit;
+      border: 2px solid #00ff66; border-radius: 32px; padding: 16px 48px; cursor: pointer;
+      margin: 10px 0 0 0; box-shadow: 0 0 24px #00ff6633, inset 0 0 20px rgba(0,255,100,0.06);
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s; letter-spacing: 4px;
     }
-    .spin-btn:hover:not(:disabled) {
-      background: rgba(0, 255, 100, 0.20);
-      box-shadow: 0 0 48px #00ff6666, inset 0 0 32px rgba(0,255,100,0.12);
-      color: #fff;
-    }
+    .spin-btn:hover:not(:disabled) { background: rgba(0,255,100,0.20); box-shadow: 0 0 48px #00ff6666, inset 0 0 32px rgba(0,255,100,0.12); color: #fff; }
     .spin-btn.loading { color: #444; background: rgba(0,0,0,0.3); border-color: #333; box-shadow: none; cursor: not-allowed; }
-    .spin-btn .spinner {
-      width: 24px; height: 24px; border: 3px solid #00ff66;
-      border-top: 3px solid var(--gold); border-radius: 50%;
-      animation: doSpin 1s linear infinite; display: inline-block;
-    }
+    .spin-btn .spinner { width: 24px; height: 24px; border: 3px solid #00ff66; border-top: 3px solid var(--gold); border-radius: 50%; animation: doSpin 1s linear infinite; display: inline-block; }
     @keyframes doSpin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
     .spin-btn:disabled:not(.loading) { background: rgba(0,0,0,0.2); color: #333; border-color: #333; box-shadow: none; cursor: not-allowed; }
+
+    /* STATUS */
     .status { margin: 12px 0 0 0; font-size: 1.2em; min-height: 1.5em; text-align: center; }
-    .status.win { color: var(--win); }
-    .status.jackpot { color: var(--jackpot); }
+    .status.win { color: var(--win); } .status.jackpot { color: var(--jackpot); }
     .status.lose { color: var(--lose); }
-    .status.network { color: var(--lose); }
     .txlink { color: var(--blue); font-size: 0.95em; }
-    .footer { text-align: center; color: #444; font-size: 1em; margin: 32px 0 0 0; }
+
+    /* PACKAGES */
     .package-row { text-align:center; margin:18px 0; }
-    .pkg-btn {
-      margin: 4px 2px;
-      border: none; border-radius: 12px;
-      padding: 8px 18px; font-size: 1.05em; cursor: pointer;
-      font-family: inherit; font-weight: bold;
-      position: relative; overflow: hidden;
-      transition: transform 0.15s, box-shadow 0.2s;
-      letter-spacing: 1px;
-    }
+    .pkg-btn { margin: 4px 2px; border: none; border-radius: 12px; padding: 8px 18px; font-size: 1.05em; cursor: pointer; font-family: inherit; font-weight: bold; position: relative; overflow: hidden; transition: transform 0.15s, box-shadow 0.2s; letter-spacing: 1px; }
     .pkg-btn:hover { transform: scale(1.07); }
     .pkg-btn:active { transform: scale(0.97); }
-    .pkg-btn::after {
+    .pkg-btn::after { content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:linear-gradient(120deg,rgba(255,255,255,0.18) 0%,rgba(255,255,255,0) 60%); transform:rotate(25deg); pointer-events:none; }
+    .pkg-1 { background:linear-gradient(90deg,#bf00ff,#7700cc); color:#fff; box-shadow:0 2px 16px #bf00ff55; }
+    .pkg-2 { background:linear-gradient(90deg,#00cfff,#0077aa); color:#000; box-shadow:0 2px 16px #00cfff55; }
+    .pkg-3 { background:linear-gradient(90deg,#ffd700,#ff9900); color:#000; box-shadow:0 2px 16px #ffd70055; }
+    .pkg-4 { background:linear-gradient(90deg,#ff3333,#cc0066); color:#fff; box-shadow:0 2px 16px #ff333355; }
+    .pkg-5 { background:linear-gradient(90deg,#00ff99,#00cc66); color:#000; box-shadow:0 2px 16px #00ff9955; }
+    .pkg-6 { background:linear-gradient(90deg,#bf00ff,#00cfff,#ffd700,#ff3333,#00ff99,#bf00ff); background-size:300% 100%; animation:pkgRainbow 2s linear infinite; color:#000; box-shadow:0 2px 24px #ffd70088; font-size:1.1em; }
+    @keyframes pkgRainbow { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
+    #spinsLeft { color: var(--gold); font-size: 1.1em; }
+
+    /* STATS */
+    .stats-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 18px 0 8px 0; }
+    .stat-box { background: rgba(255,255,255,0.04); border: 1px solid #333; border-radius: 12px; padding: 8px 18px; text-align: center; min-width: 100px; }
+    .stat-box .stat-label { color: #888; font-size: 0.85em; letter-spacing: 1px; }
+    .stat-box .stat-val { color: var(--gold); font-size: 1.2em; }
+
+    /* LOG */
+    .log-wrap { margin: 18px 0 0 0; }
+    .log-title { color: #888; font-size: 0.95em; letter-spacing: 2px; text-align: center; margin-bottom: 6px; }
+    .log-list { max-height: 140px; overflow-y: auto; border: 1px solid #222; border-radius: 12px; padding: 6px 10px; background: rgba(0,0,0,0.3); }
+    .log-list::-webkit-scrollbar { width: 4px; } .log-list::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    .log-entry { font-size: 0.95em; padding: 2px 0; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; }
+    .log-entry:last-child { border-bottom: none; }
+    .log-entry.win { color: var(--win); } .log-entry.jackpot { color: var(--jackpot); } .log-entry.lose { color: #666; }
+
+    /* NFT BADGE */
+    .nft-badge { display: none; margin: 14px auto 0; max-width: 340px; background: linear-gradient(90deg,#bf00ff22,#00ffff22); border: 2px solid var(--gold); border-radius: 16px; padding: 12px 24px; text-align: center; }
+    .nft-badge.show { display: block; animation: badgePop 0.4s cubic-bezier(.36,1.6,.6,1); }
+    @keyframes badgePop { 0%{transform:scale(0.5);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+    .nft-badge .nft-title { color: var(--gold); font-size: 1.3em; letter-spacing: 2px; }
+    .nft-badge .nft-sub { color: var(--blue); font-size: 1em; }
+
+    /* FLASH */
+    .flash-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0; transition: opacity 0.15s; }
+    .flash-overlay.win-flash { background: radial-gradient(ellipse at center,#bf00ff44 0%,transparent 70%); }
+    .flash-overlay.jackpot-flash { background: radial-gradient(ellipse at center,#00ffff66 0%,transparent 70%); }
+    .flash-overlay.active { opacity: 1; }
+
+    /* RAIN */
+    .rain-container { position: fixed; inset: 0; pointer-events: none; z-index: 9997; overflow: hidden; }
+    .rain-sym { position: absolute; top: -60px; animation: rainFall linear forwards; opacity: 0.85; }
+    @keyframes rainFall { 0%{transform:translateY(0) rotate(0deg);opacity:0.85;} 100%{transform:translateY(110vh) rotate(360deg);opacity:0;} }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 32px; right: 24px; z-index: 9999; background: #181818; border: 1px solid var(--gold); border-radius: 14px; padding: 14px 22px; min-width: 220px; max-width: 340px; box-shadow: 0 4px 32px #00000088; transform: translateX(120%); transition: transform 0.35s cubic-bezier(.36,1.1,.6,1); }
+    .toast.show { transform: translateX(0); }
+    .toast-title { color: var(--gold); font-size: 1.1em; letter-spacing: 1px; }
+    .toast-body { color: #aaa; font-size: 0.95em; margin-top: 2px; font-family: monospace; }
+
+    /* DONATE BANNER */
+    .donate-banner {
+      max-width: 900px; margin: 28px auto 0; padding: 0 12px;
+    }
+    .donate-inner {
+      border-radius: 20px; padding: 22px 28px;
+      background: linear-gradient(90deg, #0a0a0a 0%, #1a002a 30%, #001a2a 60%, #0a0a0a 100%);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .donate-inner::before {
       content: "";
-      position: absolute; top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%);
-      transform: rotate(25deg);
+      position: absolute; inset: 0;
+      border-radius: 20px;
+      padding: 2px;
+      background: linear-gradient(90deg, #bf00ff, #00ffff, #ffd700, #ff0080, #bf00ff);
+      background-size: 300% 100%;
+      animation: donateBorder 4s linear infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
       pointer-events: none;
     }
-    .pkg-1 { background: linear-gradient(90deg,#bf00ff,#7700cc); color:#fff; box-shadow: 0 2px 16px #bf00ff55; }
-    .pkg-2 { background: linear-gradient(90deg,#00cfff,#0077aa); color:#000; box-shadow: 0 2px 16px #00cfff55; }
-    .pkg-3 { background: linear-gradient(90deg,#ffd700,#ff9900); color:#000; box-shadow: 0 2px 16px #ffd70055; }
-    .pkg-4 { background: linear-gradient(90deg,#ff3333,#cc0066); color:#fff; box-shadow: 0 2px 16px #ff333355; }
-    .pkg-5 { background: linear-gradient(90deg,#00ff99,#00cc66); color:#000; box-shadow: 0 2px 16px #00ff9955; }
-    .pkg-6 {
-      background: linear-gradient(90deg,#bf00ff,#00cfff,#ffd700,#ff3333,#00ff99,#bf00ff);
-      background-size: 300% 100%;
-      animation: pkgRainbow 2s linear infinite;
-      color:#000; box-shadow: 0 2px 24px #ffd70088;
-      font-size: 1.1em;
+    @keyframes donateBorder { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
+
+    .donate-inner::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, #bf00ff18 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, #00ffff18 0%, transparent 60%);
+      pointer-events: none;
     }
-    @keyframes pkgRainbow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
+
+    .donate-title {
+      font-size: 1.6em; letter-spacing: 6px; margin: 0 0 6px 0;
+      background: linear-gradient(90deg, #ffd700, #ff0080, #bf00ff, #00ffff, #ffd700);
+      background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: titleRainbow 3s linear infinite;
+      position: relative; z-index: 1;
     }
-    #spinsLeft { color: var(--gold); font-size: 1.1em; }
-    .switch-network-btn {
-      background: var(--neon); color: #000; border: none; border-radius: 24px;
-      padding: 8px 24px; font-size: 1.1em; font-family: inherit; font-weight: bold;
-      margin: 12px auto 0 auto; display: block; cursor: pointer; box-shadow: 0 2px 16px #bf00ff22;
+    .donate-sub {
+      color: #aaa; font-size: 0.95em; margin: 0 0 16px 0; letter-spacing: 1px;
+      font-family: Arial, sans-serif; position: relative; z-index: 1;
     }
-    .switch-network-btn:active { background: var(--blue); }
+    .donate-btn {
+      display: inline-block;
+      background: linear-gradient(90deg, #bf00ff, #00cfff, #ffd700, #bf00ff);
+      background-size: 300% 100%; animation: pkgRainbow 2s linear infinite;
+      color: #000; font-family: 'Bebas Neue', sans-serif; font-size: 1.3em;
+      letter-spacing: 3px; border: none; border-radius: 32px; padding: 14px 40px;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 0 32px #bf00ff55, 0 0 64px #00ffff22;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative; z-index: 1;
+    }
+    .donate-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 48px #bf00ff88, 0 0 80px #00ffff44;
+    }
+    .donate-btn:active { transform: scale(0.98); }
+    .donate-coins { font-size: 1.5em; margin: 0 6px; vertical-align: middle; }
+
+    .footer { text-align: center; color: #444; font-size: 1em; margin: 32px 0 16px 0; }
+    .footer a { color: var(--neon); }
+
     @media (max-width: 700px) {
       .container { max-width: 99vw; padding: 24px 2vw 24px; }
       .reel { width: 90px; height: 120px; font-size: 2.8em; }
       .reels { gap: 12px; padding: 8px 0; margin: 24px 0 16px 0; }
+      h1 { font-size: 2em; letter-spacing: 4px; }
+      .donate-btn { font-size: 1.1em; padding: 12px 24px; }
     }
   </style>
 </head>
 <body>
+  <div class="flash-overlay" id="flashOverlay"></div>
+  <div class="rain-container" id="rainContainer"></div>
+  <div class="toast" id="toast"><div class="toast-title" id="toastTitle"></div><div class="toast-body" id="toastBody"></div></div>
+
+  <!-- GAME BANNER -->
+  <div class="banner-wrap">
+    <img src="https://files.catbox.moe/1ueks9.png" alt="JOKER 777 Banner" />
+  </div>
+
   <div class="container">
     <h1>🃏 JOKER 777 SLOT 🃏</h1>
     <div class="brand">⚡ Win MON &amp; NFTs · Monad Mainnet ⚡</div>
+
+    <!-- WALLET ROW -->
     <div class="wallet-row">
       <button id="btnConnect" class="wallet-btn">
         <img src="https://cryptologos.cc/logos/metamask-fox-logo.png" class="wallet-logo" alt="Wallet" />
@@ -196,17 +275,25 @@
       <span id="walletAddr" class="wallet-addr"></span>
       <span id="walletBal" class="wallet-bal"></span>
     </div>
-    <div class="jackpot">
-      Jackpot Pool: <span class="val" id="jackpotVal">0.00</span> MON
+
+    <!-- NETWORK WARNING - FIXED: shown here, above everything, not near spin -->
+    <div class="network-bar" id="networkBar">
+      <p>⚠️ Wrong network — Please switch to Monad Mainnet (Chain ID: 143)</p>
+      <button class="switch-network-btn" id="switchNetworkBtn">🔄 Switch to Monad Mainnet</button>
     </div>
+
+    <div class="jackpot">🎰 Jackpot Pool: <span class="val" id="jackpotVal">0.00</span> MON</div>
+
     <div class="slot-frame">
       <div class="reels">
-        <div class="reel" id="reel0">🍒</div>
-        <div class="reel" id="reel1">🍋</div>
-        <div class="reel" id="reel2">7️⃣</div>
+        <div class="reel" id="reel0">🃏</div>
+        <div class="reel" id="reel1">7️⃣</div>
+        <div class="reel" id="reel2">💎</div>
       </div>
     </div>
+
     <div class="bet-row" id="betRow"></div>
+
     <div class="package-row">
       <button class="pkg-btn pkg-1" onclick="buyPackage(100,1000)">100 Spins / 1000 MON</button>
       <button class="pkg-btn pkg-2" onclick="buyPackage(200,2000)">200 Spins / 2000 MON</button>
@@ -215,24 +302,60 @@
       <button class="pkg-btn pkg-5" onclick="buyPackage(500,10000)">500 Spins / 10000 MON</button>
       <button class="pkg-btn pkg-6" onclick="buyPackage(1000,100000)">⭐ 1000 Spins / 100000 MON ⭐</button>
     </div>
-    <div style="text-align:center; margin: 8px 0;">
-      <span id="spinsLeft">Spins left: 0</span>
-    </div>
-    <button id="btnSpin" class="spin-btn" disabled>
-      <span id="spinBtnText">SPIN</span>
-    </button>
+
+    <div style="text-align:center; margin: 8px 0;"><span id="spinsLeft">Spins left: 0</span></div>
+
+    <button id="btnSpin" class="spin-btn" disabled><span id="spinBtnText">SPIN</span></button>
+
     <div class="status" id="status"></div>
-    <button id="switchNetworkBtn" class="switch-network-btn" style="display:none;">Switch to Monad Mainnet</button>
     <div id="txRow" style="text-align:center; margin-top:6px;"></div>
+
+    <!-- NFT BADGE -->
+    <div class="nft-badge" id="nftBadge">
+      <div class="nft-title" id="nftTitle">🏆 NFT MINTED!</div>
+      <div class="nft-sub" id="nftSub">Jackpot Winner Badge</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-label">SPINS</div><div class="stat-val" id="statSpins">0</div></div>
+      <div class="stat-box"><div class="stat-label">WINS</div><div class="stat-val" id="statWins">0</div></div>
+      <div class="stat-box"><div class="stat-label">TOTAL BET</div><div class="stat-val" id="statBet">0 MON</div></div>
+      <div class="stat-box"><div class="stat-label">TOTAL WON</div><div class="stat-val" id="statWon">0 MON</div></div>
+    </div>
+
+    <!-- LOG -->
+    <div class="log-wrap">
+      <div class="log-title">📋 RECENT RESULTS</div>
+      <div class="log-list" id="logList">
+        <div class="log-entry lose"><span>No spins yet</span><span></span></div>
+      </div>
+    </div>
   </div>
-  <div class="footer">
+
+  <!-- DONATE BANNER -->
+  <div class="donate-banner">
+    <div class="donate-inner">
+      <div class="donate-title">💜 SUPPORT JOKER 777 💜</div>
+      <div class="donate-sub">Love the game? Help keep it running — donate MON directly on Monad!</div>
+      <a class="donate-btn" href="https://monadvision.com/myspace?feature=Wallet&type=Portfolio" target="_blank" rel="noopener">
+        <span class="donate-coins">💰</span> DONATE MON <span class="donate-coins">💰</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer" style="margin-top: 28px;">
     Joker 777 Slot · Powered by Monad · Contract:
-    <a href="https://explorer.monad.xyz/address/0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a" style="color:var(--neon)">0x2d5c...778a</a>
+    <a href="https://explorer.monad.xyz/address/0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a" target="_blank">0x2d5c...778a</a>
+    &nbsp;·&nbsp; <a href="privacy-policy.html">Privacy Policy</a>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
   <script>
     const SLOT_ADDR = "0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a";
+    const MONAD_CHAIN_ID = 143;
+    const MONAD_HEX = "0x8f";
+
     const SLOT_ABI = [
       {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
       {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},
@@ -265,9 +388,9 @@
     ];
 
     const SYMBOLS = ["🍒","🍋","🍉","🔔","💎","7️⃣","🃏","⭐","💰","👑"];
-
     let provider, signer, slot, address, bets = [], betIdx = 0, spinning = false;
     let prepaidSpins = 0, userBalance = 0;
+    let stats = { spins: 0, wins: 0, totalBet: 0, totalWon: 0 };
 
     const btnConnect = document.getElementById("btnConnect");
     const connLabel = document.getElementById("connLabel");
@@ -277,23 +400,24 @@
     const betRow = document.getElementById("betRow");
     const btnSpin = document.getElementById("btnSpin");
     const spinBtnText = document.getElementById("spinBtnText");
-    const status = document.getElementById("status");
+    const statusEl = document.getElementById("status");
     const txRow = document.getElementById("txRow");
     const spinsLeft = document.getElementById("spinsLeft");
+    const networkBar = document.getElementById("networkBar");
     const switchNetworkBtn = document.getElementById("switchNetworkBtn");
+    const nftBadge = document.getElementById("nftBadge");
+    const flashOverlay = document.getElementById("flashOverlay");
+    const rainContainer = document.getElementById("rainContainer");
+    const logList = document.getElementById("logList");
 
     // --- AUDIO ---
     let audioCtx;
-    function getAudioCtx() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      return audioCtx;
-    }
+    function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
     function playTone(freq, type, dur, vol=0.2, delay=0) {
       try {
-        const ctx = getAudioCtx();
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = type; o.frequency.setValueAtTime(freq, ctx.currentTime+delay);
+        const ctx = getAudioCtx(), o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination); o.type = type;
+        o.frequency.setValueAtTime(freq, ctx.currentTime+delay);
         g.gain.setValueAtTime(vol, ctx.currentTime+delay);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+dur);
         o.start(ctx.currentTime+delay); o.stop(ctx.currentTime+delay+dur+0.01);
@@ -301,10 +425,9 @@
     }
     function playNoise(dur, vol=0.12) {
       try {
-        const ctx = getAudioCtx();
-        const buf = ctx.createBuffer(1, ctx.sampleRate*dur, ctx.sampleRate);
+        const ctx = getAudioCtx(), buf = ctx.createBuffer(1, ctx.sampleRate*dur, ctx.sampleRate);
         const data = buf.getChannelData(0);
-        for (let i=0; i<data.length; i++) data[i]=(Math.random()*2-1);
+        for (let i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
         const src = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
         f.type='bandpass'; f.frequency.value=800; f.Q.value=0.5;
         src.buffer=buf; src.connect(f); f.connect(g); g.connect(ctx.destination);
@@ -313,83 +436,95 @@
         src.start(); src.stop(ctx.currentTime+dur+0.05);
       } catch {}
     }
-    function soundSpin() {
-      for (let i=0; i<3; i++) {
-        playTone(180+i*60,'sawtooth',0.13,0.09,i*0.07);
-        playTone(180+i*60*1.5,'sawtooth',0.10,0.07,i*0.07+0.04);
-      }
-      playNoise(0.3,0.13);
-    }
+    function soundSpin() { for(let i=0;i<3;i++){playTone(180+i*60,'sawtooth',0.13,0.09,i*0.07);playTone(180+i*60*1.5,'sawtooth',0.10,0.07,i*0.07+0.04);}playNoise(0.3,0.13); }
     function soundWin() { [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.18,0.25,i*0.12)); }
-    function soundJackpot() {
-      [523,659,784,1047,1319,1568].forEach((f,i)=>{
-        playTone(f,'sine',0.25,0.3,i*0.1);
-        playTone(f*1.5,'triangle',0.18,0.15,i*0.1+0.05);
-      });
-    }
-    function soundLose() {
-      playTone(220,'sawtooth',0.18,0.15);
-      playTone(180,'sawtooth',0.18,0.15,0.1);
-      playTone(150,'sawtooth',0.2,0.12,0.22);
-    }
+    function soundJackpot() { [523,659,784,1047,1319,1568].forEach((f,i)=>{playTone(f,'sine',0.25,0.3,i*0.1);playTone(f*1.5,'triangle',0.18,0.15,i*0.1+0.05);}); }
+    function soundLose() { playTone(220,'sawtooth',0.18,0.15); playTone(180,'sawtooth',0.18,0.15,0.1); playTone(150,'sawtooth',0.2,0.12,0.22); }
 
-    // --- NETWORK ---
+    // --- NETWORK CHECK - FIXED ---
     async function checkNetwork() {
       if (!window.ethereum) return false;
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if (parseInt(chainId, 16) !== 143) {
-        status.textContent = "Please switch to Monad Mainnet (chain 143)";
-        status.className = "status network";
+      const isMonad = parseInt(chainId, 16) === MONAD_CHAIN_ID;
+      if (!isMonad) {
+        networkBar.classList.add("show");
         btnSpin.disabled = true;
-        switchNetworkBtn.style.display = "block";
         return false;
       }
-      status.className = "status";
+      networkBar.classList.remove("show");
       btnSpin.disabled = false;
-      switchNetworkBtn.style.display = "none";
       return true;
     }
 
+    // Listen for network changes
     if (window.ethereum) {
-      window.ethereum.on('chainChanged', () => checkNetwork());
+      window.ethereum.on('chainChanged', async () => {
+        const ok = await checkNetwork();
+        if (ok && slot) { loadBalance(); loadBets(); loadJackpot(); }
+      });
     }
 
+    // SWITCH NETWORK - FIXED with proper try/catch and add chain fallback
     switchNetworkBtn.onclick = async function() {
-      if (!window.ethereum) return;
+      if (!window.ethereum) {
+        showToast("No Wallet", "Please install MetaMask or Rabby");
+        return;
+      }
       try {
-        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x8f' }] });
-      } catch (e) {
-        if (e.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: '0x8f',
-              chainName: 'Monad Mainnet',
-              nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
-              rpcUrls: ['https://rpc.monad.xyz'],
-              blockExplorerUrls: ['https://explorer.monad.xyz']
-            }]
-          });
+        // First try to switch
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: MONAD_HEX }]
+        });
+        // If switch succeeded, checkNetwork will fire via chainChanged event
+      } catch (switchError) {
+        // 4902 = chain not added yet
+        if (switchError.code === 4902 || switchError.code === -32603) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: MONAD_HEX,
+                chainName: 'Monad Mainnet',
+                nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
+                rpcUrls: ['https://rpc.monad.xyz', 'https://monad-mainnet.g.alchemy.com/v2/public'],
+                blockExplorerUrls: ['https://explorer.monad.xyz']
+              }]
+            });
+          } catch (addError) {
+            showToast("Error", "Could not add Monad network. Add it manually in MetaMask.");
+          }
+        } else {
+          showToast("Rejected", "Network switch was rejected.");
         }
       }
     };
 
     // --- WALLET CONNECT ---
     btnConnect.onclick = async function() {
-      if (!window.ethereum) { status.textContent = "Install MetaMask or Rabby"; return; }
-      provider = new ethers.BrowserProvider(window.ethereum, "any");
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      signer = await provider.getSigner();
-      address = await signer.getAddress();
-      slot = new ethers.Contract(SLOT_ADDR, SLOT_ABI, signer);
-      connLabel.textContent = "Connected";
-      btnConnect.classList.add("connected");
-      walletAddr.textContent = address.slice(0,6) + "..." + address.slice(-4);
-      await checkNetwork();
-      loadBalance();
-      loadBets();
-      loadJackpot();
+      if (!window.ethereum) { showResult("Install MetaMask or Rabby", "lose"); return; }
+      try {
+        provider = new ethers.BrowserProvider(window.ethereum, "any");
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        signer = await provider.getSigner();
+        address = await signer.getAddress();
+        slot = new ethers.Contract(SLOT_ADDR, SLOT_ABI, signer);
+        connLabel.textContent = "Connected";
+        btnConnect.classList.add("connected");
+        walletAddr.textContent = shortAddr(address);
+        const ok = await checkNetwork();
+        if (ok) {
+          loadBalance(); loadBets(); loadJackpot();
+          showResult("✅ Wallet connected! Ready to spin.", "win");
+        }
+        showToast("Wallet Connected", shortAddr(address));
+        listenSpinEvents();
+      } catch(e) {
+        showResult("Connection failed: " + (e.message || e), "lose");
+      }
     };
+
+    function shortAddr(a) { return a ? a.slice(0,6)+"..."+a.slice(-4) : ""; }
 
     async function loadBalance() {
       if (!provider || !address) return;
@@ -400,14 +535,12 @@
 
     async function loadBets() {
       if (!slot) return;
-      const len = await slot.allowedBetsLength();
-      bets = [];
+      const len = await slot.allowedBetsLength(); bets = [];
       for (let i = 0; i < Number(len); i++) {
         const v = await slot.allowedBets(i);
         bets.push({ idx: i, value: v, label: Number(ethers.formatEther(v)).toFixed(4) + " MON" });
       }
-      betIdx = 0;
-      renderBets();
+      betIdx = 0; renderBets();
     }
 
     function renderBets() {
@@ -423,37 +556,40 @@
 
     async function loadJackpot() {
       if (!slot) return;
-      const jp = await slot.jackpotPool();
-      jackpotVal.textContent = Number(ethers.formatEther(jp)).toFixed(4);
+      try { const jp = await slot.jackpotPool(); jackpotVal.textContent = Number(ethers.formatEther(jp)).toFixed(4); } catch {}
     }
     setInterval(loadJackpot, 8000);
+
+    function listenSpinEvents() {
+      if (!slot) return;
+      slot.on("Spin", (player, betAmount, rand, win, jackpot, payout) => {
+        if (player.toLowerCase() === address.toLowerCase()) return;
+        const short = shortAddr(player);
+        const amt = Number(ethers.formatEther(payout)).toFixed(2);
+        if (jackpot) { addLog(`🎉 ${short} HIT JACKPOT! +${amt} MON`, "", "jackpot"); showToast("🎉 JACKPOT!", `${short} won ${amt} MON`); }
+        else if (win) { addLog(`⭐ ${short} won +${amt} MON`, "", "win"); }
+      });
+    }
 
     function updateSpinsLeft() { spinsLeft.textContent = "Spins left: " + prepaidSpins; }
 
     async function buyPackage(spins, moons) {
-      if (!slot || !signer) { status.textContent = "Connect wallet first!"; return; }
+      if (!slot || !signer) { showResult("Connect wallet first!", "lose"); return; }
       if (spinning) return;
-      if (userBalance < moons) {
-        status.textContent = "Not enough MON for this package!";
-        status.className = "status lose";
-        return;
-      }
+      if (userBalance < moons) { showResult("Not enough MON for this package!", "lose"); return; }
       try {
-        status.textContent = `Buying ${spins} spins for ${moons} MON...`;
-        status.className = "status";
+        showResult(`Buying ${spins} spins for ${moons} MON...`, "");
         btnSpin.disabled = true;
         const tx = await slot.buySpins(spins, { value: ethers.parseEther(moons.toString()) });
         txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
         await tx.wait();
         prepaidSpins = Number(await slot.prepaidSpins(address));
         updateSpinsLeft();
-        status.textContent = `Package purchased! You have ${prepaidSpins} spins.`;
-        status.className = "status win";
-        btnSpin.disabled = false;
-        loadBalance();
+        showResult(`✅ Package purchased! ${prepaidSpins} spins ready.`, "win");
+        showToast("Package Bought", `${prepaidSpins} spins loaded!`);
+        btnSpin.disabled = false; loadBalance();
       } catch (e) {
-        status.textContent = e.reason || e.shortMessage || e.message || "TX failed";
-        status.className = "status lose";
+        showResult(e.reason || e.shortMessage || e.message || "TX failed", "lose");
         btnSpin.disabled = false;
       }
     }
@@ -465,108 +601,160 @@
       if (!slot || spinning) return;
       if (!(await checkNetwork())) return;
       prepaidSpins = Number(await slot.prepaidSpins(address));
-      spinning = true;
-      btnSpin.disabled = true;
+      spinning = true; btnSpin.disabled = true;
       btnSpin.classList.add("loading");
       spinBtnText.innerHTML = '<span class="spinner"></span> SPIN';
-      txRow.innerHTML = "";
-      let tx, receipt, spinEvent;
+      txRow.innerHTML = ""; nftBadge.classList.remove("show");
+      const currentBet = bets[betIdx] ? Number(ethers.formatEther(bets[betIdx].value)) : 0;
       try {
-        if (prepaidSpins > 0) {
-          status.textContent = "Spinning (prepaid)...";
-          status.className = "status";
-          soundSpin();
-          tx = await slot.spinWithPackage();
-        } else {
-          status.textContent = "Spinning...";
-          status.className = "status";
-          soundSpin();
-          const bet = bets[betIdx];
-          tx = await slot.spin(bet.idx, { value: bet.value });
-        }
-        txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
-        status.textContent = "Waiting for result...";
-        receipt = await tx.wait();
+        let tx;
+        if (prepaidSpins > 0) { showResult("Spinning (prepaid)...", ""); soundSpin(); tx = await slot.spinWithPackage(); }
+        else { showResult("Spinning...", ""); soundSpin(); const bet = bets[betIdx]; tx = await slot.spin(bet.idx, { value: bet.value }); }
 
-        // Parse Spin event
-        spinEvent = receipt.logs.map(log => {
+        txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
+        showResult("Waiting for result...", "");
+        const receipt = await tx.wait();
+
+        const spinEvent = receipt.logs.map(log => {
           try { return slot.interface.parseLog(log); } catch { return null; }
         }).find(e => e && e.name === "Spin");
 
-        await animateReels();
-
         if (spinEvent) {
-          const { win, jackpot, rand } = spinEvent.args;
+          const { win, jackpot, rand, payout } = spinEvent.args;
           const r = Number(rand);
+          const payoutMON = Number(ethers.formatEther(payout)).toFixed(2);
+          stats.spins++;
+          if (prepaidSpins <= 0) stats.totalBet += currentBet;
+
           if (jackpot) {
             const sym = r % SYMBOLS.length;
-            setReels([sym, sym, sym]);
+            await animateReels(sym, sym, sym);
             highlightReels([0,1,2], "#00ffff");
-            status.textContent = "🎉 JACKPOT! You won the pool!";
-            status.className = "status jackpot";
-            soundJackpot();
+            showResult("🎉 JACKPOT! You won the pool!", "jackpot");
+            soundJackpot(); flashScreen("jackpot-flash"); startRain(30);
+            showNFTBadge("🏆 JACKPOT WINNER!", "NFT Badge minted to your wallet");
+            stats.wins++; stats.totalWon += Number(ethers.formatEther(payout));
+            addLog(`🎉 JACKPOT! +${payoutMON} MON`, "", "jackpot");
+            showToast("🎉 JACKPOT!", `You won ${payoutMON} MON!`);
           } else if (win) {
             const sym = r % SYMBOLS.length;
-            setReels([sym, sym, sym]);
+            await animateReels(sym, sym, sym);
             highlightReels([0,1,2], "#bf00ff");
-            status.textContent = "⭐ You win! Payout sent!";
-            status.className = "status win";
-            soundWin();
+            showResult(`⭐ You win! +${payoutMON} MON`, "win");
+            soundWin(); flashScreen("win-flash"); startRain(12);
+            stats.wins++; stats.totalWon += Number(ethers.formatEther(payout));
+            addLog(`⭐ WIN +${payoutMON} MON`, "", "win");
+            showToast("⭐ Winner!", `+${payoutMON} MON sent!`);
           } else {
             let s1 = r % SYMBOLS.length;
-            let s2 = (s1 + 1 + Math.floor(Math.random()*4)) % SYMBOLS.length;
-            let s3 = (s1 + 3 + Math.floor(Math.random()*4)) % SYMBOLS.length;
-            if (s2 === s1) s2 = (s2+1) % SYMBOLS.length;
-            if (s3 === s1 || s3 === s2) s3 = (s3+2) % SYMBOLS.length;
-            setReels([s1, s2, s3]);
+            let s2 = (s1+1+Math.floor(Math.random()*4)) % SYMBOLS.length;
+            let s3 = (s1+3+Math.floor(Math.random()*4)) % SYMBOLS.length;
+            if (s2===s1) s2=(s2+1)%SYMBOLS.length;
+            if (s3===s1||s3===s2) s3=(s3+2)%SYMBOLS.length;
+            await animateReels(s1, s2, s3);
             clearHighlight();
-            status.textContent = "No win. Try again!";
-            status.className = "status lose";
+            showResult("No win. Try again!", "lose");
             soundLose();
+            addLog("❌ No win", "", "lose");
           }
+          updateStats();
         } else {
-          status.textContent = "Spin complete!";
-          status.className = "status";
+          await animateReels();
+          showResult("Spin complete!", "");
         }
 
         setTimeout(clearHighlight, 1500);
         prepaidSpins = Number(await slot.prepaidSpins(address));
-        updateSpinsLeft();
-        loadBalance();
-        loadJackpot();
+        updateSpinsLeft(); loadBalance(); loadJackpot();
       } catch (e) {
-        status.textContent = e.reason || e.shortMessage || e.message || "TX failed";
-        status.className = "status lose";
+        showResult(e.reason || e.shortMessage || e.message || "TX failed", "lose");
         soundLose();
       }
-      spinning = false;
-      btnSpin.disabled = false;
-      btnSpin.classList.remove("loading");
-      spinBtnText.textContent = "SPIN";
+      spinning = false; btnSpin.disabled = false;
+      btnSpin.classList.remove("loading"); spinBtnText.textContent = "SPIN";
     };
 
     // --- REELS ---
     function randSym() { return Math.floor(Math.random() * SYMBOLS.length); }
-    function setReels(arr) {
-      for (let i = 0; i < 3; i++) document.getElementById("reel"+i).textContent = SYMBOLS[arr[i] % SYMBOLS.length];
+    function setReel(i, sym) { document.getElementById("reel"+i).textContent = SYMBOLS[sym % SYMBOLS.length]; }
+    function setReels(arr) { for (let i=0;i<3;i++) setReel(i, arr[i]); }
+
+    async function animReel(idx, finalSym, dur) {
+      const el = document.getElementById("reel"+idx);
+      const end = Date.now() + dur;
+      while (Date.now() < end) { el.textContent = SYMBOLS[randSym()]; await new Promise(r => setTimeout(r, 65)); }
+      el.textContent = SYMBOLS[finalSym % SYMBOLS.length];
     }
-    async function animateReels() {
-      for (let t = 0; t < 14; t++) {
-        setReels([randSym(), randSym(), randSym()]);
-        await new Promise(res => setTimeout(res, 55));
-      }
+
+    async function animateReels(s0, s1, s2) {
+      const r0 = s0 !== undefined ? s0 : randSym();
+      const r1 = s1 !== undefined ? s1 : randSym();
+      const r2 = s2 !== undefined ? s2 : randSym();
+      await Promise.all([animReel(0, r0, 600), animReel(1, r1, 850), animReel(2, r2, 1100)]);
     }
+
     function highlightReels(indices, color) {
-      for (let i = 0; i < 3; i++) {
+      for (let i=0;i<3;i++) {
         document.getElementById("reel"+i).style.boxShadow = indices.includes(i)
           ? `0 0 64px 16px ${color}, 0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset`
           : "0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset";
       }
     }
-    function clearHighlight() {
-      for (let i = 0; i < 3; i++) {
-        document.getElementById("reel"+i).style.boxShadow = "0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset";
+    function clearHighlight() { for(let i=0;i<3;i++) document.getElementById("reel"+i).style.boxShadow="0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset"; }
+
+    function showResult(msg, cls) { statusEl.textContent = msg; statusEl.className = "status"+(cls?" "+cls:""); }
+
+    function flashScreen(cls) {
+      flashOverlay.className = "flash-overlay "+cls+" active";
+      setTimeout(() => { flashOverlay.className = "flash-overlay "+cls; }, 500);
+    }
+
+    function startRain(count) {
+      rainContainer.innerHTML = "";
+      for (let i=0;i<count;i++) {
+        const el = document.createElement("div"); el.className = "rain-sym";
+        el.textContent = SYMBOLS[randSym()];
+        el.style.left = Math.random()*100+"vw";
+        el.style.animationDuration = (1.2+Math.random()*2)+"s";
+        el.style.animationDelay = (Math.random()*0.8)+"s";
+        el.style.fontSize = (1.5+Math.random()*2)+"em";
+        rainContainer.appendChild(el);
+        el.addEventListener("animationend", () => el.remove());
       }
+    }
+
+    function showNFTBadge(title, sub) {
+      document.getElementById("nftTitle").textContent = title;
+      document.getElementById("nftSub").textContent = sub;
+      nftBadge.classList.add("show");
+      setTimeout(() => nftBadge.classList.remove("show"), 6000);
+    }
+
+    function updateStats() {
+      document.getElementById("statSpins").textContent = stats.spins;
+      document.getElementById("statWins").textContent = stats.wins;
+      document.getElementById("statBet").textContent = stats.totalBet.toFixed(2)+" MON";
+      document.getElementById("statWon").textContent = stats.totalWon.toFixed(2)+" MON";
+    }
+
+    function addLog(result, amount, cls) {
+      const empty = logList.querySelector(".log-entry.lose span");
+      if (empty && empty.textContent === "No spins yet") logList.innerHTML = "";
+      const entry = document.createElement("div");
+      entry.className = "log-entry "+cls;
+      entry.innerHTML = `<span>${result}</span><span style="color:#888;font-size:0.85em">${new Date().toLocaleTimeString()}</span>`;
+      logList.prepend(entry);
+      while (logList.children.length > 20) logList.lastChild.remove();
+    }
+
+    let toastTimer;
+    function showToast(title, body) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastTitle").textContent = title;
+      document.getElementById("toastBody").textContent = body;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
     }
 
     setReels([randSym(), randSym(), randSym()]);
