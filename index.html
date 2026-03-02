@@ -464,39 +464,44 @@
       });
     }
 
-    // SWITCH NETWORK - FIXED with proper try/catch and add chain fallback
+    // SWITCH NETWORK — always try addEthereumChain, works for all wallets & error codes
     switchNetworkBtn.onclick = async function() {
       if (!window.ethereum) {
         showToast("No Wallet", "Please install MetaMask or Rabby");
         return;
       }
+
+      const MONAD_PARAMS = {
+        chainId: MONAD_HEX,
+        chainName: 'Monad Mainnet',
+        nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
+        rpcUrls: ['https://rpc.monad.xyz'],
+        blockExplorerUrls: ['https://explorer.monad.xyz']
+      };
+
+      // Step 1: try switch first (works if chain already added)
       try {
-        // First try to switch
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: MONAD_HEX }]
         });
-        // If switch succeeded, checkNetwork will fire via chainChanged event
-      } catch (switchError) {
-        // 4902 = chain not added yet
-        if (switchError.code === 4902 || switchError.code === -32603) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: MONAD_HEX,
-                chainName: 'Monad Mainnet',
-                nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
-                rpcUrls: ['https://rpc.monad.xyz', 'https://monad-mainnet.g.alchemy.com/v2/public'],
-                blockExplorerUrls: ['https://explorer.monad.xyz']
-              }]
-            });
-          } catch (addError) {
-            showToast("Error", "Could not add Monad network. Add it manually in MetaMask.");
-          }
-        } else {
-          showToast("Rejected", "Network switch was rejected.");
-        }
+        return; // success — chainChanged event will handle the rest
+      } catch (e) {
+        // Any error (4902, -32603, user rejection of switch, etc.)
+        // — fall through to addEthereumChain which also triggers a switch prompt
+      }
+
+      // Step 2: add & switch (handles chain-not-found AND re-prompts user)
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [MONAD_PARAMS]
+        });
+        // After add, verify we're now on the right chain
+        await checkNetwork();
+      } catch (addErr) {
+        // User explicitly rejected the add/switch popup
+        showToast("⚠️ Cancelled", "Please approve the network switch in your wallet.");
       }
     };
 
