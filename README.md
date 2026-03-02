@@ -1,6 +1,6 @@
 # JOKER 777 — Monad Slot Machine
 
-![Banner](https://files.catbox.moe/1ueks9.png)
+![JOKER 777 Banner](https://files.catbox.moe/9o0wad.png)
 
 A fully on-chain slot machine game for the Monad Testnet, featuring a neon UI, wallet connection, and NFT rewards.
 
@@ -102,10 +102,3 @@ A fully on-chain slot machine game for the Monad Testnet, featuring a neon UI, w
   Loads Ethers.js v6 from CDN if not already loaded.
 
 ---
-
-## Banner
-
-The banner image is displayed at the top of the page:
-
-```html
-<img src="https://files.catbox.moe/1ueks9.png" alt="JOKER 777 Banner" style="width:100%;max-width:900px;display:block;margin:24px auto 0;box-shadow:0 0 32px #ff2d9b55;border-radius:12px;">
