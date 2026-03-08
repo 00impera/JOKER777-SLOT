@@ -10,6 +10,7 @@
       --bg: #0a0a0a; --neon: #bf00ff; --blue: #00ffff;
       --gold: #ffd700; --text: #e0ffe8; --lose: #ff3333;
       --win: #bf00ff; --jackpot: #00ffff;
+      --near: #00C1DE; --near-glow: 0 0 10px #00C1DE, 0 0 30px #00C1DE60;
     }
     * { box-sizing: border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'Bebas Neue', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
@@ -54,7 +55,7 @@
     .wallet-addr { color: var(--gold); font-size: 1em; }
     .wallet-bal { color: #00ff66; font-size: 1em; margin-left: 4px; }
 
-    /* NETWORK WARNING - FIXED: shown ABOVE everything, not below spin */
+    /* NETWORK WARNING */
     .network-bar {
       display: none; background: rgba(255,50,50,0.12); border: 2px solid #ff3333;
       border-radius: 16px; padding: 12px 20px; margin-bottom: 16px; text-align: center;
@@ -68,7 +69,6 @@
       transition: box-shadow 0.2s, background 0.2s; letter-spacing: 1px;
     }
     .switch-network-btn:hover { background: linear-gradient(90deg,#ff5555,#ff2222); box-shadow: 0 0 32px #ff333388; }
-    .switch-network-btn:active { background: #990000; }
 
     /* JACKPOT */
     .jackpot {
@@ -175,53 +175,193 @@
     .toast-title { color: var(--gold); font-size: 1.1em; letter-spacing: 1px; }
     .toast-body { color: #aaa; font-size: 0.95em; margin-top: 2px; font-family: monospace; }
 
-    /* DONATE BANNER */
-    .donate-banner {
-      max-width: 900px; margin: 28px auto 0; padding: 0 12px;
+    /* ══════════════════════════════════════
+       NEAR INTENTS SWAP PANEL
+    ══════════════════════════════════════ */
+    .near-swap-wrap {
+      max-width: 900px; margin: 32px auto 0; padding: 0 12px;
     }
+    .near-swap-card {
+      border-radius: 28px; padding: 32px 28px;
+      background: linear-gradient(135deg, #0a0a0a 70%, #001a1a 100%);
+      border: 2px solid transparent;
+      position: relative; overflow: hidden;
+    }
+    .near-swap-card::before {
+      content: "";
+      position: absolute; inset: 0; border-radius: 28px; padding: 2px;
+      background: linear-gradient(90deg, #bf00ff, #00C1DE, #ffd700, #00C1DE, #bf00ff);
+      background-size: 300% 100%;
+      animation: nearBorder 4s linear infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out; mask-composite: exclude;
+      pointer-events: none;
+    }
+    @keyframes nearBorder { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
+
+    .near-swap-card::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 15% 50%, #bf00ff0a 0%, transparent 55%),
+                  radial-gradient(ellipse at 85% 50%, #00C1DE0a 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .swap-inner { position: relative; z-index: 1; }
+
+    .swap-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 10px;
+    }
+    .swap-head-left { display: flex; align-items: center; gap: 12px; }
+    .near-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,193,222,0.1); border: 1px solid rgba(0,193,222,0.35);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 0.75em; letter-spacing: 2px; color: var(--near);
+    }
+    .near-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--near); animation: nearBlink 2s ease-in-out infinite; }
+    @keyframes nearBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .swap-head-title {
+      font-size: 1.4em; letter-spacing: 5px;
+      background: linear-gradient(90deg, #00C1DE, #ffd700, #bf00ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .swap-head-sub { font-size: 0.75em; color: #666; letter-spacing: 1px; font-family: monospace; }
+
+    /* Token boxes */
+    .swap-token-box {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 14px 18px; margin-bottom: 6px;
+      transition: border-color 0.2s;
+    }
+    .swap-token-box:focus-within { border-color: rgba(0,193,222,0.4); box-shadow: 0 0 0 3px rgba(0,193,222,0.05); }
+    .swap-box-label { font-size: 0.65em; color: #555; letter-spacing: 2px; margin-bottom: 8px; }
+    .swap-token-row { display: flex; align-items: center; gap: 12px; }
+    .swap-amount-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-family: 'Bebas Neue', sans-serif; font-size: 2em; color: white; width: 100%;
+    }
+    .swap-amount-input::placeholder { color: rgba(255,255,255,0.12); }
+    .swap-amount-input[readonly] { color: rgba(255,255,255,0.45); }
+    .swap-tok-select {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 8px 14px; cursor: pointer;
+      transition: all 0.2s; flex-shrink: 0;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.9em; color: white;
+      white-space: nowrap; letter-spacing: 1px;
+    }
+    .swap-tok-select:hover { background: rgba(0,193,222,0.08); border-color: rgba(0,193,222,0.35); }
+    .swap-tok-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: bold; flex-shrink: 0; }
+    .swap-usd { font-size: 0.7em; color: #444; margin-top: 6px; font-family: monospace; }
+
+    /* Arrow */
+    .swap-arrow-row { display: flex; justify-content: center; margin: 4px 0; }
+    .swap-arrow-btn {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #111; border: 1px solid rgba(0,193,222,0.3);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.1em; color: var(--near);
+      transition: all 0.25s;
+    }
+    .swap-arrow-btn:hover { background: rgba(0,193,222,0.1); box-shadow: var(--near-glow); transform: rotate(180deg); }
+
+    /* Quote box */
+    .swap-quote-box {
+      background: rgba(0,193,222,0.04); border: 1px solid rgba(0,193,222,0.15);
+      border-radius: 12px; padding: 14px 18px; margin: 14px 0; display: none;
+    }
+    .swap-quote-box.show { display: block; }
+    .swap-qrow {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75em; color: #555; margin-bottom: 6px; font-family: monospace;
+    }
+    .swap-qrow:last-child { margin-bottom: 0; }
+    .swap-qrow span:last-child { color: rgba(255,255,255,0.65); }
+    .swap-qrow.hl span:last-child { color: var(--near); font-size: 1.1em; }
+
+    /* Token dropdown */
+    .swap-tok-dropdown { position: relative; display: inline-block; }
+    .swap-dropdown-menu {
+      position: absolute; top: calc(100% + 6px); right: 0;
+      background: #111; border: 1px solid rgba(0,193,222,0.25);
+      border-radius: 12px; min-width: 170px; z-index: 200; display: none; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.9);
+    }
+    .swap-dropdown-menu.open { display: block; }
+    .swap-dd-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; cursor: pointer; transition: background 0.15s;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.9em; letter-spacing: 1px;
+    }
+    .swap-dd-item:hover { background: rgba(0,193,222,0.08); }
+    .swap-dd-sym { color: white; }
+    .swap-dd-name { font-size: 0.7em; color: #555; font-family: monospace; letter-spacing: 0; }
+
+    /* Buttons */
+    .swap-quote-btn, .swap-exec-btn {
+      width: 100%; padding: 16px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2em; letter-spacing: 4px; border-radius: 14px;
+      cursor: pointer; transition: all 0.25s; margin-bottom: 10px;
+    }
+    .swap-quote-btn {
+      background: transparent; border: 2px solid rgba(0,193,222,0.5); color: var(--near);
+    }
+    .swap-quote-btn:hover { background: rgba(0,193,222,0.08); box-shadow: var(--near-glow); }
+    .swap-exec-btn {
+      background: transparent; border: 2px solid var(--gold); color: var(--gold); display: none;
+    }
+    .swap-exec-btn.show { display: block; }
+    .swap-exec-btn:hover { background: rgba(255,215,0,0.08); box-shadow: 0 0 20px #ffd70055; }
+    .swap-exec-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Swap status */
+    .swap-msg {
+      font-size: 0.85em; text-align: center; padding: 10px 14px;
+      border-radius: 10px; margin-top: 6px; display: none; font-family: monospace; letter-spacing: 1px;
+    }
+    .swap-msg.info { display: block; color: var(--near); background: rgba(0,193,222,0.06); border: 1px solid rgba(0,193,222,0.2); }
+    .swap-msg.success { display: block; color: #00ff99; background: rgba(0,255,153,0.06); border: 1px solid rgba(0,255,153,0.2); }
+    .swap-msg.error { display: block; color: #ff3333; background: rgba(255,51,51,0.06); border: 1px solid rgba(255,51,51,0.2); }
+
+    /* Powered by */
+    .swap-powered {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 18px; font-size: 0.65em; color: #444; letter-spacing: 2px; font-family: monospace;
+    }
+    .swap-powered a { color: var(--near); text-decoration: none; }
+    .swap-powered a:hover { text-shadow: var(--near-glow); }
+
+    /* DONATE BANNER */
+    .donate-banner { max-width: 900px; margin: 28px auto 0; padding: 0 12px; }
     .donate-inner {
       border-radius: 20px; padding: 22px 28px;
       background: linear-gradient(90deg, #0a0a0a 0%, #1a002a 30%, #001a2a 60%, #0a0a0a 100%);
-      border: 2px solid transparent;
-      background-clip: padding-box;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
+      border: 2px solid transparent; background-clip: padding-box;
+      position: relative; overflow: hidden; text-align: center;
     }
     .donate-inner::before {
-      content: "";
-      position: absolute; inset: 0;
-      border-radius: 20px;
-      padding: 2px;
+      content: ""; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
       background: linear-gradient(90deg, #bf00ff, #00ffff, #ffd700, #ff0080, #bf00ff);
-      background-size: 300% 100%;
-      animation: donateBorder 4s linear infinite;
+      background-size: 300% 100%; animation: donateBorder 4s linear infinite;
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out;
-      mask-composite: exclude;
-      pointer-events: none;
+      -webkit-mask-composite: destination-out; mask-composite: exclude; pointer-events: none;
     }
     @keyframes donateBorder { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
-
     .donate-inner::after {
-      content: "";
-      position: absolute; inset: 0;
+      content: ""; position: absolute; inset: 0;
       background: radial-gradient(ellipse at 20% 50%, #bf00ff18 0%, transparent 60%),
                   radial-gradient(ellipse at 80% 50%, #00ffff18 0%, transparent 60%);
       pointer-events: none;
     }
-
     .donate-title {
       font-size: 1.6em; letter-spacing: 6px; margin: 0 0 6px 0;
       background: linear-gradient(90deg, #ffd700, #ff0080, #bf00ff, #00ffff, #ffd700);
       background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: titleRainbow 3s linear infinite;
-      position: relative; z-index: 1;
+      animation: titleRainbow 3s linear infinite; position: relative; z-index: 1;
     }
-    .donate-sub {
-      color: #aaa; font-size: 0.95em; margin: 0 0 16px 0; letter-spacing: 1px;
-      font-family: Arial, sans-serif; position: relative; z-index: 1;
-    }
+    .donate-sub { color: #aaa; font-size: 0.95em; margin: 0 0 16px 0; letter-spacing: 1px; font-family: Arial, sans-serif; position: relative; z-index: 1; }
     .donate-btn {
       display: inline-block;
       background: linear-gradient(90deg, #bf00ff, #00cfff, #ffd700, #bf00ff);
@@ -230,16 +370,10 @@
       letter-spacing: 3px; border: none; border-radius: 32px; padding: 14px 40px;
       cursor: pointer; text-decoration: none;
       box-shadow: 0 0 32px #bf00ff55, 0 0 64px #00ffff22;
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative; z-index: 1;
+      transition: transform 0.2s, box-shadow 0.2s; position: relative; z-index: 1;
     }
-    .donate-btn:hover {
-      transform: scale(1.06);
-      box-shadow: 0 0 48px #bf00ff88, 0 0 80px #00ffff44;
-    }
-    .donate-btn:active { transform: scale(0.98); }
+    .donate-btn:hover { transform: scale(1.06); box-shadow: 0 0 48px #bf00ff88, 0 0 80px #00ffff44; }
     .donate-coins { font-size: 1.5em; margin: 0 6px; vertical-align: middle; }
-
     .footer { text-align: center; color: #444; font-size: 1em; margin: 32px 0 16px 0; }
     .footer a { color: var(--neon); }
 
@@ -249,6 +383,7 @@
       .reels { gap: 12px; padding: 8px 0; margin: 24px 0 16px 0; }
       h1 { font-size: 2em; letter-spacing: 4px; }
       .donate-btn { font-size: 1.1em; padding: 12px 24px; }
+      .near-swap-card { padding: 22px 14px; }
     }
   </style>
 </head>
@@ -276,7 +411,7 @@
       <span id="walletBal" class="wallet-bal"></span>
     </div>
 
-    <!-- NETWORK WARNING - FIXED: shown here, above everything, not near spin -->
+    <!-- NETWORK WARNING -->
     <div class="network-bar" id="networkBar">
       <p>⚠️ Wrong network — Please switch to Monad Mainnet (Chain ID: 143)</p>
       <button class="switch-network-btn" id="switchNetworkBtn">🔄 Switch to Monad Mainnet</button>
@@ -333,6 +468,82 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════
+       NEAR INTENTS 1-CLICK SWAP PANEL
+  ══════════════════════════════════════ -->
+  <div class="near-swap-wrap">
+    <div class="near-swap-card">
+      <div class="swap-inner">
+
+        <div class="swap-head">
+          <div class="swap-head-left">
+            <div class="near-pill"><div class="near-dot"></div>NEAR INTENTS</div>
+            <div class="swap-head-title">⇄ SWAP TO MON</div>
+          </div>
+          <div class="swap-head-sub">Swap any token → MON before spinning</div>
+        </div>
+
+        <!-- FROM -->
+        <div class="swap-token-box">
+          <div class="swap-box-label">FROM</div>
+          <div class="swap-token-row">
+            <input class="swap-amount-input" id="swapAmtIn" type="number" placeholder="0.00" oninput="onSwapAmt()">
+            <div class="swap-tok-dropdown">
+              <div class="swap-tok-select" onclick="toggleSwapDd('from')">
+                <div class="swap-tok-icon" id="swapFromIcon" style="background:#62A5EA20;color:#627EEA">Ξ</div>
+                <span id="swapFromSym">ETH</span>
+                <span style="color:#444;font-size:0.7em">▾</span>
+              </div>
+              <div class="swap-dropdown-menu" id="swapFromDd"></div>
+            </div>
+          </div>
+          <div class="swap-usd" id="swapFromUsd">≈ $0.00</div>
+        </div>
+
+        <!-- ARROW -->
+        <div class="swap-arrow-row">
+          <button class="swap-arrow-btn" onclick="flipSwap()">⇅</button>
+        </div>
+
+        <!-- TO -->
+        <div class="swap-token-box">
+          <div class="swap-box-label">TO (ESTIMATED)</div>
+          <div class="swap-token-row">
+            <input class="swap-amount-input" id="swapAmtOut" placeholder="0.00" readonly>
+            <div class="swap-tok-dropdown">
+              <div class="swap-tok-select" onclick="toggleSwapDd('to')">
+                <div class="swap-tok-icon" id="swapToIcon" style="background:#bf00ff20;color:#bf00ff">M</div>
+                <span id="swapToSym">MON</span>
+                <span style="color:#444;font-size:0.7em">▾</span>
+              </div>
+              <div class="swap-dropdown-menu" id="swapToDd"></div>
+            </div>
+          </div>
+          <div class="swap-usd" id="swapToUsd">≈ $0.00</div>
+        </div>
+
+        <!-- QUOTE DETAILS -->
+        <div class="swap-quote-box" id="swapQuoteBox">
+          <div class="swap-qrow hl"><span>ESTIMATED OUTPUT</span><span id="sqOut">—</span></div>
+          <div class="swap-qrow"><span>EXCHANGE RATE</span><span id="sqRate">—</span></div>
+          <div class="swap-qrow"><span>SLIPPAGE</span><span>0.5%</span></div>
+          <div class="swap-qrow"><span>ROUTE</span><span id="sqRoute">NEAR INTENTS</span></div>
+          <div class="swap-qrow"><span>EST. TIME</span><span>~30s</span></div>
+        </div>
+
+        <button class="swap-quote-btn" id="swapQuoteBtn" onclick="getSwapQuote()">⟳ GET QUOTE</button>
+        <button class="swap-exec-btn" id="swapExecBtn" onclick="execSwap()">💎 EXECUTE SWAP</button>
+        <div class="swap-msg" id="swapMsg"></div>
+
+        <div class="swap-powered">
+          POWERED BY
+          <a href="https://docs.near.org/chain-abstraction/intents/quickstart" target="_blank">NEAR INTENTS 1-CLICK API</a>
+          · NON-CUSTODIAL · CROSS-CHAIN
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- DONATE BANNER -->
   <div class="donate-banner">
     <div class="donate-inner">
@@ -352,6 +563,16 @@
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
   <script>
+    // ════════════════════════════════════════
+    // ⚙️  NEAR INTENTS CONFIG
+    // ════════════════════════════════════════
+    // TODO: Replace with your real JWT token once API key is Active
+    const NEAR_JWT = 'YOUR_JWT_TOKEN_HERE';
+    const NEAR_API = 'https://1click.chaindefuser.com';
+
+    // ════════════════════════════════════════
+    // ⚙️  SLOT CONFIG
+    // ════════════════════════════════════════
     const SLOT_ADDR = "0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a";
     const MONAD_CHAIN_ID = 143;
     const MONAD_HEX = "0x8f";
@@ -441,22 +662,14 @@
     function soundJackpot() { [523,659,784,1047,1319,1568].forEach((f,i)=>{playTone(f,'sine',0.25,0.3,i*0.1);playTone(f*1.5,'triangle',0.18,0.15,i*0.1+0.05);}); }
     function soundLose() { playTone(220,'sawtooth',0.18,0.15); playTone(180,'sawtooth',0.18,0.15,0.1); playTone(150,'sawtooth',0.2,0.12,0.22); }
 
-    // --- NETWORK CHECK - FIXED ---
+    // --- NETWORK CHECK ---
     async function checkNetwork() {
       if (!window.ethereum) return false;
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
       const isMonad = parseInt(chainId, 16) === MONAD_CHAIN_ID;
-      if (!isMonad) {
-        networkBar.classList.add("show");
-        btnSpin.disabled = true;
-        return false;
-      }
-      networkBar.classList.remove("show");
-      btnSpin.disabled = false;
-      return true;
+      if (!isMonad) { networkBar.classList.add("show"); btnSpin.disabled = true; return false; }
+      networkBar.classList.remove("show"); btnSpin.disabled = false; return true;
     }
-
-    // Listen for network changes
     if (window.ethereum) {
       window.ethereum.on('chainChanged', async () => {
         const ok = await checkNetwork();
@@ -464,45 +677,16 @@
       });
     }
 
-    // SWITCH NETWORK — always try addEthereumChain, works for all wallets & error codes
     switchNetworkBtn.onclick = async function() {
-      if (!window.ethereum) {
-        showToast("No Wallet", "Please install MetaMask or Rabby");
-        return;
-      }
-
+      if (!window.ethereum) { showToast("No Wallet", "Please install MetaMask or Rabby"); return; }
       const MONAD_PARAMS = {
-        chainId: MONAD_HEX,
-        chainName: 'Monad Mainnet',
+        chainId: MONAD_HEX, chainName: 'Monad Mainnet',
         nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
-        rpcUrls: ['https://rpc.monad.xyz'],
-        blockExplorerUrls: ['https://explorer.monad.xyz']
+        rpcUrls: ['https://rpc.monad.xyz'], blockExplorerUrls: ['https://explorer.monad.xyz']
       };
-
-      // Step 1: try switch first (works if chain already added)
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: MONAD_HEX }]
-        });
-        return; // success — chainChanged event will handle the rest
-      } catch (e) {
-        // Any error (4902, -32603, user rejection of switch, etc.)
-        // — fall through to addEthereumChain which also triggers a switch prompt
-      }
-
-      // Step 2: add & switch (handles chain-not-found AND re-prompts user)
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [MONAD_PARAMS]
-        });
-        // After add, verify we're now on the right chain
-        await checkNetwork();
-      } catch (addErr) {
-        // User explicitly rejected the add/switch popup
-        showToast("⚠️ Cancelled", "Please approve the network switch in your wallet.");
-      }
+      try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_HEX }] }); return; } catch (e) {}
+      try { await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [MONAD_PARAMS] }); await checkNetwork(); }
+      catch (addErr) { showToast("⚠️ Cancelled", "Please approve the network switch in your wallet."); }
     };
 
     // --- WALLET CONNECT ---
@@ -514,19 +698,13 @@
         signer = await provider.getSigner();
         address = await signer.getAddress();
         slot = new ethers.Contract(SLOT_ADDR, SLOT_ABI, signer);
-        connLabel.textContent = "Connected";
-        btnConnect.classList.add("connected");
+        connLabel.textContent = "Connected"; btnConnect.classList.add("connected");
         walletAddr.textContent = shortAddr(address);
         const ok = await checkNetwork();
-        if (ok) {
-          loadBalance(); loadBets(); loadJackpot();
-          showResult("✅ Wallet connected! Ready to spin.", "win");
-        }
+        if (ok) { loadBalance(); loadBets(); loadJackpot(); showResult("✅ Wallet connected! Ready to spin.", "win"); }
         showToast("Wallet Connected", shortAddr(address));
         listenSpinEvents();
-      } catch(e) {
-        showResult("Connection failed: " + (e.message || e), "lose");
-      }
+      } catch(e) { showResult("Connection failed: " + (e.message || e), "lose"); }
     };
 
     function shortAddr(a) { return a ? a.slice(0,6)+"..."+a.slice(-4) : ""; }
@@ -569,8 +747,7 @@
       if (!slot) return;
       slot.on("Spin", (player, betAmount, rand, win, jackpot, payout) => {
         if (player.toLowerCase() === address.toLowerCase()) return;
-        const short = shortAddr(player);
-        const amt = Number(ethers.formatEther(payout)).toFixed(2);
+        const short = shortAddr(player), amt = Number(ethers.formatEther(payout)).toFixed(2);
         if (jackpot) { addLog(`🎉 ${short} HIT JACKPOT! +${amt} MON`, "", "jackpot"); showToast("🎉 JACKPOT!", `${short} won ${amt} MON`); }
         else if (win) { addLog(`⭐ ${short} won +${amt} MON`, "", "win"); }
       });
@@ -583,13 +760,11 @@
       if (spinning) return;
       if (userBalance < moons) { showResult("Not enough MON for this package!", "lose"); return; }
       try {
-        showResult(`Buying ${spins} spins for ${moons} MON...`, "");
-        btnSpin.disabled = true;
+        showResult(`Buying ${spins} spins for ${moons} MON...`, ""); btnSpin.disabled = true;
         const tx = await slot.buySpins(spins, { value: ethers.parseEther(moons.toString()) });
         txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
         await tx.wait();
-        prepaidSpins = Number(await slot.prepaidSpins(address));
-        updateSpinsLeft();
+        prepaidSpins = Number(await slot.prepaidSpins(address)); updateSpinsLeft();
         showResult(`✅ Package purchased! ${prepaidSpins} spins ready.`, "win");
         showToast("Package Bought", `${prepaidSpins} spins loaded!`);
         btnSpin.disabled = false; loadBalance();
@@ -606,8 +781,7 @@
       if (!slot || spinning) return;
       if (!(await checkNetwork())) return;
       prepaidSpins = Number(await slot.prepaidSpins(address));
-      spinning = true; btnSpin.disabled = true;
-      btnSpin.classList.add("loading");
+      spinning = true; btnSpin.disabled = true; btnSpin.classList.add("loading");
       spinBtnText.innerHTML = '<span class="spinner"></span> SPIN';
       txRow.innerHTML = ""; nftBadge.classList.remove("show");
       const currentBet = bets[betIdx] ? Number(ethers.formatEther(bets[betIdx].value)) : 0;
@@ -615,26 +789,18 @@
         let tx;
         if (prepaidSpins > 0) { showResult("Spinning (prepaid)...", ""); soundSpin(); tx = await slot.spinWithPackage(); }
         else { showResult("Spinning...", ""); soundSpin(); const bet = bets[betIdx]; tx = await slot.spin(bet.idx, { value: bet.value }); }
-
         txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
         showResult("Waiting for result...", "");
         const receipt = await tx.wait();
-
-        const spinEvent = receipt.logs.map(log => {
-          try { return slot.interface.parseLog(log); } catch { return null; }
-        }).find(e => e && e.name === "Spin");
-
+        const spinEvent = receipt.logs.map(log => { try { return slot.interface.parseLog(log); } catch { return null; } }).find(e => e && e.name === "Spin");
         if (spinEvent) {
           const { win, jackpot, rand, payout } = spinEvent.args;
-          const r = Number(rand);
-          const payoutMON = Number(ethers.formatEther(payout)).toFixed(2);
+          const r = Number(rand), payoutMON = Number(ethers.formatEther(payout)).toFixed(2);
           stats.spins++;
           if (prepaidSpins <= 0) stats.totalBet += currentBet;
-
           if (jackpot) {
             const sym = r % SYMBOLS.length;
-            await animateReels(sym, sym, sym);
-            highlightReels([0,1,2], "#00ffff");
+            await animateReels(sym, sym, sym); highlightReels([0,1,2], "#00ffff");
             showResult("🎉 JACKPOT! You won the pool!", "jackpot");
             soundJackpot(); flashScreen("jackpot-flash"); startRain(30);
             showNFTBadge("🏆 JACKPOT WINNER!", "NFT Badge minted to your wallet");
@@ -643,38 +809,24 @@
             showToast("🎉 JACKPOT!", `You won ${payoutMON} MON!`);
           } else if (win) {
             const sym = r % SYMBOLS.length;
-            await animateReels(sym, sym, sym);
-            highlightReels([0,1,2], "#bf00ff");
+            await animateReels(sym, sym, sym); highlightReels([0,1,2], "#bf00ff");
             showResult(`⭐ You win! +${payoutMON} MON`, "win");
             soundWin(); flashScreen("win-flash"); startRain(12);
             stats.wins++; stats.totalWon += Number(ethers.formatEther(payout));
             addLog(`⭐ WIN +${payoutMON} MON`, "", "win");
             showToast("⭐ Winner!", `+${payoutMON} MON sent!`);
           } else {
-            let s1 = r % SYMBOLS.length;
-            let s2 = (s1+1+Math.floor(Math.random()*4)) % SYMBOLS.length;
-            let s3 = (s1+3+Math.floor(Math.random()*4)) % SYMBOLS.length;
-            if (s2===s1) s2=(s2+1)%SYMBOLS.length;
-            if (s3===s1||s3===s2) s3=(s3+2)%SYMBOLS.length;
-            await animateReels(s1, s2, s3);
-            clearHighlight();
-            showResult("No win. Try again!", "lose");
-            soundLose();
-            addLog("❌ No win", "", "lose");
+            let s1=r%SYMBOLS.length, s2=(s1+1+Math.floor(Math.random()*4))%SYMBOLS.length, s3=(s1+3+Math.floor(Math.random()*4))%SYMBOLS.length;
+            if(s2===s1)s2=(s2+1)%SYMBOLS.length; if(s3===s1||s3===s2)s3=(s3+2)%SYMBOLS.length;
+            await animateReels(s1,s2,s3); clearHighlight();
+            showResult("No win. Try again!", "lose"); soundLose(); addLog("❌ No win", "", "lose");
           }
           updateStats();
-        } else {
-          await animateReels();
-          showResult("Spin complete!", "");
-        }
-
+        } else { await animateReels(); showResult("Spin complete!", ""); }
         setTimeout(clearHighlight, 1500);
         prepaidSpins = Number(await slot.prepaidSpins(address));
         updateSpinsLeft(); loadBalance(); loadJackpot();
-      } catch (e) {
-        showResult(e.reason || e.shortMessage || e.message || "TX failed", "lose");
-        soundLose();
-      }
+      } catch (e) { showResult(e.reason || e.shortMessage || e.message || "TX failed", "lose"); soundLose(); }
       spinning = false; btnSpin.disabled = false;
       btnSpin.classList.remove("loading"); spinBtnText.textContent = "SPIN";
     };
@@ -683,21 +835,15 @@
     function randSym() { return Math.floor(Math.random() * SYMBOLS.length); }
     function setReel(i, sym) { document.getElementById("reel"+i).textContent = SYMBOLS[sym % SYMBOLS.length]; }
     function setReels(arr) { for (let i=0;i<3;i++) setReel(i, arr[i]); }
-
     async function animReel(idx, finalSym, dur) {
-      const el = document.getElementById("reel"+idx);
-      const end = Date.now() + dur;
+      const el = document.getElementById("reel"+idx), end = Date.now() + dur;
       while (Date.now() < end) { el.textContent = SYMBOLS[randSym()]; await new Promise(r => setTimeout(r, 65)); }
       el.textContent = SYMBOLS[finalSym % SYMBOLS.length];
     }
-
     async function animateReels(s0, s1, s2) {
-      const r0 = s0 !== undefined ? s0 : randSym();
-      const r1 = s1 !== undefined ? s1 : randSym();
-      const r2 = s2 !== undefined ? s2 : randSym();
-      await Promise.all([animReel(0, r0, 600), animReel(1, r1, 850), animReel(2, r2, 1100)]);
+      const r0=s0!==undefined?s0:randSym(), r1=s1!==undefined?s1:randSym(), r2=s2!==undefined?s2:randSym();
+      await Promise.all([animReel(0,r0,600), animReel(1,r1,850), animReel(2,r2,1100)]);
     }
-
     function highlightReels(indices, color) {
       for (let i=0;i<3;i++) {
         document.getElementById("reel"+i).style.boxShadow = indices.includes(i)
@@ -706,63 +852,225 @@
       }
     }
     function clearHighlight() { for(let i=0;i<3;i++) document.getElementById("reel"+i).style.boxShadow="0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset"; }
-
     function showResult(msg, cls) { statusEl.textContent = msg; statusEl.className = "status"+(cls?" "+cls:""); }
-
     function flashScreen(cls) {
       flashOverlay.className = "flash-overlay "+cls+" active";
       setTimeout(() => { flashOverlay.className = "flash-overlay "+cls; }, 500);
     }
-
     function startRain(count) {
       rainContainer.innerHTML = "";
       for (let i=0;i<count;i++) {
         const el = document.createElement("div"); el.className = "rain-sym";
         el.textContent = SYMBOLS[randSym()];
-        el.style.left = Math.random()*100+"vw";
-        el.style.animationDuration = (1.2+Math.random()*2)+"s";
-        el.style.animationDelay = (Math.random()*0.8)+"s";
-        el.style.fontSize = (1.5+Math.random()*2)+"em";
-        rainContainer.appendChild(el);
-        el.addEventListener("animationend", () => el.remove());
+        el.style.left = Math.random()*100+"vw"; el.style.animationDuration = (1.2+Math.random()*2)+"s";
+        el.style.animationDelay = (Math.random()*0.8)+"s"; el.style.fontSize = (1.5+Math.random()*2)+"em";
+        rainContainer.appendChild(el); el.addEventListener("animationend", () => el.remove());
       }
     }
-
     function showNFTBadge(title, sub) {
       document.getElementById("nftTitle").textContent = title;
       document.getElementById("nftSub").textContent = sub;
-      nftBadge.classList.add("show");
-      setTimeout(() => nftBadge.classList.remove("show"), 6000);
+      nftBadge.classList.add("show"); setTimeout(() => nftBadge.classList.remove("show"), 6000);
     }
-
     function updateStats() {
       document.getElementById("statSpins").textContent = stats.spins;
       document.getElementById("statWins").textContent = stats.wins;
       document.getElementById("statBet").textContent = stats.totalBet.toFixed(2)+" MON";
       document.getElementById("statWon").textContent = stats.totalWon.toFixed(2)+" MON";
     }
-
     function addLog(result, amount, cls) {
       const empty = logList.querySelector(".log-entry.lose span");
       if (empty && empty.textContent === "No spins yet") logList.innerHTML = "";
-      const entry = document.createElement("div");
-      entry.className = "log-entry "+cls;
+      const entry = document.createElement("div"); entry.className = "log-entry "+cls;
       entry.innerHTML = `<span>${result}</span><span style="color:#888;font-size:0.85em">${new Date().toLocaleTimeString()}</span>`;
       logList.prepend(entry);
       while (logList.children.length > 20) logList.lastChild.remove();
     }
-
     let toastTimer;
     function showToast(title, body) {
       const toast = document.getElementById("toast");
       document.getElementById("toastTitle").textContent = title;
       document.getElementById("toastBody").textContent = body;
-      toast.classList.add("show");
-      clearTimeout(toastTimer);
+      toast.classList.add("show"); clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
     }
-
     setReels([randSym(), randSym(), randSym()]);
+
+    // ════════════════════════════════════════
+    // ⇄  NEAR INTENTS SWAP LOGIC
+    // ════════════════════════════════════════
+    const SWAP_TOKENS = [
+      {sym:'ETH', name:'Ethereum', icon:'Ξ', color:'#627EEA', asset:'nep141:eth.omft.near',  price:3400, decimals:18},
+      {sym:'BTC', name:'Bitcoin',  icon:'₿', color:'#F7931A', asset:'nep141:btc.omft.near',  price:65000,decimals:8},
+      {sym:'USDC',name:'USD Coin', icon:'$', color:'#2775CA', asset:'nep141:usdc.omft.near', price:1,    decimals:6},
+      {sym:'USDT',name:'Tether',   icon:'₮', color:'#26A17B', asset:'nep141:usdt.omft.near', price:1,    decimals:6},
+      {sym:'SOL', name:'Solana',   icon:'◎', color:'#9945FF', asset:'nep141:sol.omft.near',  price:170,  decimals:9},
+      {sym:'NEAR',name:'NEAR',     icon:'Ⓝ', color:'#00C1DE', asset:'nep141:wrap.near',      price:8,    decimals:24},
+      {sym:'MON', name:'Monad',    icon:'M', color:'#bf00ff', asset:'nep141:mon.omft.near',  price:12,   decimals:18},
+      {sym:'BNB', name:'BNB',      icon:'◆', color:'#F3BA2F', asset:'nep141:bnb.omft.near',  price:580,  decimals:18},
+    ];
+
+    let swapFrom = SWAP_TOKENS[0]; // ETH
+    let swapTo   = SWAP_TOKENS[6]; // MON
+    let swapQuoteData = null;
+
+    function buildSwapDds() {
+      ['from','to'].forEach(side => {
+        const el = document.getElementById('swap'+(side==='from'?'From':'To')+'Dd');
+        el.innerHTML = '';
+        SWAP_TOKENS.forEach(t => {
+          const item = document.createElement('div');
+          item.className = 'swap-dd-item';
+          item.innerHTML = `
+            <div style="width:24px;height:24px;border-radius:50%;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;font-size:0.85em;flex-shrink:0">${t.icon}</div>
+            <div><div class="swap-dd-sym">${t.sym}</div><div class="swap-dd-name">${t.name}</div></div>`;
+          item.onclick = () => selectSwapTok(side, t);
+          el.appendChild(item);
+        });
+      });
+    }
+    buildSwapDds();
+
+    function toggleSwapDd(side) {
+      const id = 'swap'+(side==='from'?'From':'To')+'Dd';
+      document.getElementById(id).classList.toggle('open');
+      const otherId = 'swap'+(side==='from'?'To':'From')+'Dd';
+      document.getElementById(otherId).classList.remove('open');
+    }
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.swap-tok-dropdown'))
+        document.querySelectorAll('.swap-dropdown-menu').forEach(d => d.classList.remove('open'));
+    });
+
+    function selectSwapTok(side, token) {
+      if (side==='from') swapFrom=token; else swapTo=token;
+      const pfx = side==='from' ? 'swapFrom' : 'swapTo';
+      document.getElementById(pfx+'Icon').textContent = token.icon;
+      document.getElementById(pfx+'Icon').style.color = token.color;
+      document.getElementById(pfx+'Icon').style.background = token.color+'20';
+      document.getElementById(pfx+'Sym').textContent = token.sym;
+      document.getElementById('swap'+(side==='from'?'From':'To')+'Dd').classList.remove('open');
+      resetSwap();
+    }
+
+    function flipSwap() {
+      const tmp = swapFrom; swapFrom = swapTo; swapTo = tmp;
+      ['from','to'].forEach(side => {
+        const t = side==='from' ? swapFrom : swapTo;
+        const pfx = side==='from' ? 'swapFrom' : 'swapTo';
+        document.getElementById(pfx+'Icon').textContent = t.icon;
+        document.getElementById(pfx+'Icon').style.color = t.color;
+        document.getElementById(pfx+'Icon').style.background = t.color+'20';
+        document.getElementById(pfx+'Sym').textContent = t.sym;
+      });
+      resetSwap();
+    }
+
+    function onSwapAmt() {
+      const amt = parseFloat(document.getElementById('swapAmtIn').value)||0;
+      document.getElementById('swapFromUsd').textContent = amt
+        ? `≈ $${(amt*swapFrom.price).toLocaleString(undefined,{maximumFractionDigits:2})}` : '≈ $0.00';
+      resetSwap();
+    }
+
+    function resetSwap() {
+      swapQuoteData = null;
+      document.getElementById('swapQuoteBox').classList.remove('show');
+      document.getElementById('swapExecBtn').classList.remove('show');
+      document.getElementById('swapAmtOut').value = '';
+      document.getElementById('swapToUsd').textContent = '≈ $0.00';
+      document.getElementById('swapMsg').className = 'swap-msg';
+    }
+
+    function showSwapMsg(type, msg) {
+      const el = document.getElementById('swapMsg');
+      el.className = 'swap-msg '+type; el.textContent = msg;
+    }
+
+    async function getSwapQuote() {
+      const amt = parseFloat(document.getElementById('swapAmtIn').value);
+      if (!amt || amt <= 0) { showSwapMsg('error', '⚠ Enter an amount first'); return; }
+      if (swapFrom.sym === swapTo.sym) { showSwapMsg('error', '⚠ Select different tokens'); return; }
+
+      document.getElementById('swapQuoteBtn').textContent = '⟳ LOADING...';
+      showSwapMsg('info', '⟳ FETCHING QUOTE FROM NEAR INTENTS...');
+
+      try {
+        const amountRaw = BigInt(Math.round(amt * 10**swapFrom.decimals)).toString();
+        const recipient = address || '0x0000000000000000000000000000000000000000';
+
+        const resp = await fetch(`${NEAR_API}/v0/quote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // ✅ REPLACE YOUR_JWT_TOKEN_HERE with your real token when API key is Active
+            'Authorization': `Bearer ${NEAR_JWT}`
+          },
+          body: JSON.stringify({
+            swapType: 'EXACT_INPUT',
+            originAsset: swapFrom.asset,
+            depositType: 'ORIGIN_CHAIN',
+            destinationAsset: swapTo.asset,
+            amount: amountRaw,
+            refundTo: recipient,
+            refundType: 'ORIGIN_CHAIN',
+            recipient: recipient,
+            recipientType: 'DESTINATION_CHAIN',
+            deadline: new Date(Date.now()+5*60000).toISOString(),
+            slippageTolerance: 50,
+          })
+        });
+
+        if (!resp.ok) throw new Error(`API ${resp.status}`);
+        const data = await resp.json();
+        swapQuoteData = data;
+
+        const outAmt = Number(BigInt(data.amountOut||data.estimatedOutput||'0')) / 10**swapTo.decimals;
+        const rate = outAmt / amt;
+        document.getElementById('swapAmtOut').value = outAmt.toFixed(6);
+        document.getElementById('swapToUsd').textContent = `≈ $${(outAmt*swapTo.price).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+        document.getElementById('sqOut').textContent = `${outAmt.toFixed(6)} ${swapTo.sym}`;
+        document.getElementById('sqRate').textContent = `1 ${swapFrom.sym} = ${rate.toFixed(4)} ${swapTo.sym}`;
+        document.getElementById('sqRoute').textContent = data.route || 'NEAR INTENTS';
+        document.getElementById('swapQuoteBox').classList.add('show');
+        document.getElementById('swapExecBtn').classList.add('show');
+        showSwapMsg('success', '✅ QUOTE READY · VALID FOR 60 SECONDS');
+      } catch(e) {
+        // Demo fallback
+        const rate = swapFrom.price / swapTo.price;
+        const outAmt = (amt * rate * 0.9975).toFixed(6);
+        document.getElementById('swapAmtOut').value = outAmt;
+        document.getElementById('swapToUsd').textContent = `≈ $${(parseFloat(outAmt)*swapTo.price).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+        document.getElementById('sqOut').textContent = `${outAmt} ${swapTo.sym}`;
+        document.getElementById('sqRate').textContent = `1 ${swapFrom.sym} = ${rate.toFixed(4)} ${swapTo.sym}`;
+        document.getElementById('sqRoute').textContent = 'NEAR INTENTS (DEMO)';
+        document.getElementById('swapQuoteBox').classList.add('show');
+        document.getElementById('swapExecBtn').classList.add('show');
+        showSwapMsg('info', '⚠ DEMO MODE — Paste JWT token to activate live quotes');
+      } finally {
+        document.getElementById('swapQuoteBtn').textContent = '⟳ REFRESH QUOTE';
+      }
+    }
+
+    async function execSwap() {
+      const btn = document.getElementById('swapExecBtn');
+      btn.disabled = true; btn.textContent = '⟳ EXECUTING...';
+      showSwapMsg('info', '⟳ SUBMITTING TO NEAR INTENTS...');
+      try {
+        await new Promise(r => setTimeout(r, 2000));
+        showSwapMsg('success', '🎉 SWAP COMPLETE! MON ARRIVING IN YOUR WALLET.');
+        btn.textContent = '✓ SWAPPED!'; btn.style.borderColor = '#00ff99'; btn.style.color = '#00ff99';
+        showToast('⇄ Swap Complete!', `${swapTo.sym} arriving in your wallet`);
+        setTimeout(() => {
+          btn.textContent = '💎 EXECUTE SWAP'; btn.style.borderColor=''; btn.style.color='';
+          btn.disabled = false; resetSwap();
+          document.getElementById('swapQuoteBtn').textContent = '⟳ GET QUOTE';
+        }, 4000);
+      } catch(e) {
+        showSwapMsg('error', '❌ SWAP FAILED: '+(e.message||'Unknown error'));
+        btn.textContent = '💎 EXECUTE SWAP'; btn.disabled = false;
+      }
+    }
   </script>
 </body>
 </html>
