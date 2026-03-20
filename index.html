@@ -1,1076 +1,1292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Joker 777 Slot</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0a0a; --neon: #bf00ff; --blue: #00ffff;
-      --gold: #ffd700; --text: #e0ffe8; --lose: #ff3333;
-      --win: #bf00ff; --jackpot: #00ffff;
-      --near: #00C1DE; --near-glow: 0 0 10px #00C1DE, 0 0 30px #00C1DE60;
-    }
-    * { box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: 'Bebas Neue', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>JOKER 777 — Las Vegas Slot</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Share+Tech+Mono&family=Russo+One&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   LAS VEGAS NEON PALETTE
+══════════════════════════════════════════ */
+:root{
+  --bg:#040008;
+  --bg2:#080010;
+  --n1:#ff00ff;  /* magenta neon */
+  --n2:#ff3300;  /* red neon */
+  --n3:#ffcc00;  /* gold neon */
+  --n4:#00ffff;  /* cyan neon */
+  --n5:#ff0066;  /* pink neon */
+  --n6:#00ff88;  /* green neon */
+  --panel:rgba(8,0,20,0.95);
+  --border:rgba(255,0,255,0.2);
+  --text:#fff0ff;
+  --dim:#552255;
+  --win:#ff00ff;
+  --jackpot:#ffcc00;
+  --lose:#ff3333;
+}
 
-    /* GAME BANNER */
-    .banner-wrap { max-width: 900px; margin: 24px auto 0; padding: 0 12px; }
-    .banner-wrap img { width: 100%; border-radius: 16px; box-shadow: 0 0 40px #ff2d9b55, 0 0 80px #bf00ff22; display: block; }
+/* ── VIBRATE ── */
+@keyframes vibrate{
+  0%{transform:translate(0,0) rotate(0deg) scale(1);}
+  15%{transform:translate(-3px,2px) rotate(-1deg) scale(1.02);}
+  30%{transform:translate(3px,-2px) rotate(1deg) scale(0.98);}
+  50%{transform:translate(-2px,3px) rotate(-.5deg) scale(1.02);}
+  70%{transform:translate(2px,-2px) rotate(.5deg) scale(0.98);}
+  85%{transform:translate(-1px,1px) rotate(-.3deg) scale(1);}
+  100%{transform:translate(0,0) rotate(0deg) scale(1);}
+}
+.vib{animation:vibrate 0.35s cubic-bezier(.36,.07,.19,.97)!important;}
 
-    .container {
-      max-width: 900px; margin: 24px auto 0;
-      background: linear-gradient(135deg, #0a0a0a 80%, #bf00ff10 100%);
-      border: 4px solid var(--gold); border-radius: 48px; padding: 48px 32px 48px;
-      box-shadow: 0 0 128px #bf00ff15, 0 0 0 12px #00ffff30 inset;
-    }
-    h1 {
-      font-size: 3em; letter-spacing: 10px;
-      background: linear-gradient(90deg, #ff0080, #ffd700, #bf00ff, #00ffff, #ff0080);
-      background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: titleRainbow 3s linear infinite; margin: 0 0 8px 0; text-align: center;
-      filter: drop-shadow(0 0 18px #ffd700cc);
-    }
-    @keyframes titleRainbow { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
-    .brand {
-      font-size: 1.2em; text-align: center; margin-bottom: 18px; letter-spacing: 3px;
-      background: linear-gradient(90deg, #ffd700, #ff0080, #00ffff, #ffd700);
-      background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: brandShift 4s linear infinite;
-    }
-    @keyframes brandShift { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
+*{box-sizing:border-box;margin:0;padding:0;}
 
-    /* WALLET */
-    .wallet-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
-    .wallet-btn {
-      background: linear-gradient(90deg, #00cc44, #009933); color: #000; font-size: 1.1em;
-      border: 2px solid #00ff66; border-radius: 32px; padding: 10px 28px; cursor: pointer;
-      font-family: inherit; font-weight: bold; display: flex; align-items: center; gap: 10px;
-      transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 0 18px #00ff6644, 0 2px 8px #000;
-    }
-    .wallet-btn:hover { background: linear-gradient(90deg,#00ff66,#00cc44); box-shadow: 0 0 32px #00ff6688, 0 2px 8px #000; }
-    .wallet-btn.connected { background: linear-gradient(90deg,#000,#111); color: #00ff66; border: 2px solid #00ff66; box-shadow: 0 0 18px #00ff6644; cursor: default; }
-    .wallet-logo { width: 24px; height: 24px; border-radius: 50%; }
-    .wallet-addr { color: var(--gold); font-size: 1em; }
-    .wallet-bal { color: #00ff66; font-size: 1em; margin-left: 4px; }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Oswald',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
-    /* NETWORK WARNING */
-    .network-bar {
-      display: none; background: rgba(255,50,50,0.12); border: 2px solid #ff3333;
-      border-radius: 16px; padding: 12px 20px; margin-bottom: 16px; text-align: center;
-    }
-    .network-bar.show { display: block; }
-    .network-bar p { color: #ff6666; margin: 0 0 10px 0; font-size: 1.05em; letter-spacing: 1px; }
-    .switch-network-btn {
-      background: linear-gradient(90deg, #ff3333, #cc0000); color: #fff; border: none;
-      border-radius: 24px; padding: 10px 28px; font-size: 1.1em; font-family: inherit;
-      font-weight: bold; cursor: pointer; box-shadow: 0 0 18px #ff333355;
-      transition: box-shadow 0.2s, background 0.2s; letter-spacing: 1px;
-    }
-    .switch-network-btn:hover { background: linear-gradient(90deg,#ff5555,#ff2222); box-shadow: 0 0 32px #ff333388; }
+/* ── NEON GRID BG ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,0,255,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,0,255,0.04) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 0%,rgba(255,0,255,0.1) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 0%,rgba(255,51,0,0.08) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 100%,rgba(255,204,0,0.06) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+  animation:bgShift 8s ease-in-out infinite alternate;
+}
+@keyframes bgShift{0%{opacity:.7}100%{opacity:1}}
 
-    /* JACKPOT */
-    .jackpot {
-      background: rgba(191,0,255,0.07); border: 1px solid var(--neon);
-      border-radius: 16px; text-align: center; padding: 10px 0; margin-bottom: 18px; font-size: 1.2em;
-      animation: jackpotPulse 2.5s ease-in-out infinite;
-    }
-    @keyframes jackpotPulse { 0%,100%{box-shadow:0 0 8px #bf00ff33;} 50%{box-shadow:0 0 28px #bf00ffaa;} }
-    .jackpot .val { color: var(--gold); font-size: 1.3em; font-weight: bold; }
+/* ── LAYOUT ── */
+.page{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:16px;}
 
-    /* SLOT */
-    .slot-frame { background: linear-gradient(180deg,#222 60%,#111 100%); border-radius: 40px; padding: 24px 0 32px 0; box-shadow: 0 0 32px #bf00ff15; margin-bottom: 24px; }
-    .reels {
-      display: flex; justify-content: center; gap: 64px; margin: 48px 0 32px 0;
-      background: linear-gradient(90deg,#222 0%,#333 100%); border-radius: 32px; padding: 32px 0;
-      box-shadow: 0 8px 32px #bf00ff30, 0 0 0 8px var(--gold) inset;
-    }
-    .reel {
-      width: 200px; height: 260px; background: #181818; border-radius: 32px;
-      display: flex; align-items: center; justify-content: center; font-size: 7em;
-      box-shadow: 0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset;
-      border: 5px solid var(--gold); user-select: none;
-      transition: box-shadow 0.2s, border 0.2s; position: relative; overflow: hidden;
-    }
-    .reel:after { content:""; position:absolute; left:0; right:0; top:0; height:35%; background:linear-gradient(180deg,rgba(255,255,255,0.18),transparent); border-radius:32px 32px 0 0; pointer-events:none; }
+/* ── HEADER ── */
+.lv-header{
+  text-align:center;
+  padding:20px 12px 12px;
+  position:relative;
+}
 
-    /* BETS */
-    .bet-row { text-align: center; margin-bottom: 12px; }
-    .bet-btn { background: #222; color: #fff; border: 1px solid #444; border-radius: 10px; padding: 6px 16px; margin: 0 2px; font-size: 1.1em; cursor: pointer; font-family: inherit; transition: background 0.2s; }
-    .bet-btn:hover { border-color: var(--gold); }
-    .bet-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+.lv-banner{
+  width:100%;max-width:860px;
+  border-radius:16px;
+  border:3px solid var(--n1);
+  box-shadow:0 0 40px rgba(255,0,255,0.4),0 0 80px rgba(255,0,255,0.15);
+  display:block;margin:0 auto 16px;
+}
 
-    /* SPIN BTN */
-    .spin-btn {
-      display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-      background: rgba(0,255,100,0.10); color: #00ff66; font-size: 1.5em; font-family: inherit;
-      border: 2px solid #00ff66; border-radius: 32px; padding: 16px 48px; cursor: pointer;
-      margin: 10px 0 0 0; box-shadow: 0 0 24px #00ff6633, inset 0 0 20px rgba(0,255,100,0.06);
-      transition: background 0.2s, box-shadow 0.2s, color 0.2s; letter-spacing: 4px;
-    }
-    .spin-btn:hover:not(:disabled) { background: rgba(0,255,100,0.20); box-shadow: 0 0 48px #00ff6666, inset 0 0 32px rgba(0,255,100,0.12); color: #fff; }
-    .spin-btn.loading { color: #444; background: rgba(0,0,0,0.3); border-color: #333; box-shadow: none; cursor: not-allowed; }
-    .spin-btn .spinner { width: 24px; height: 24px; border: 3px solid #00ff66; border-top: 3px solid var(--gold); border-radius: 50%; animation: doSpin 1s linear infinite; display: inline-block; }
-    @keyframes doSpin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-    .spin-btn:disabled:not(.loading) { background: rgba(0,0,0,0.2); color: #333; border-color: #333; box-shadow: none; cursor: not-allowed; }
+.lv-title{
+  font-family:'Russo One',sans-serif;
+  font-size:clamp(28px,6vw,56px);
+  letter-spacing:8px;
+  background:linear-gradient(90deg,#ff0080,#ffcc00,#ff00ff,#00ffff,#ff3300,#ffcc00,#ff0080);
+  background-size:300% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:titleRainbow 3s linear infinite;
+  filter:drop-shadow(0 0 20px rgba(255,0,255,0.6));
+  line-height:1;
+}
+@keyframes titleRainbow{0%{background-position:0% center}100%{background-position:300% center}}
 
-    /* STATUS */
-    .status { margin: 12px 0 0 0; font-size: 1.2em; min-height: 1.5em; text-align: center; }
-    .status.win { color: var(--win); } .status.jackpot { color: var(--jackpot); }
-    .status.lose { color: var(--lose); }
-    .txlink { color: var(--blue); font-size: 0.95em; }
+.lv-sub{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:4px;color:var(--dim);margin-top:6px;
+}
 
-    /* PACKAGES */
-    .package-row { text-align:center; margin:18px 0; }
-    .pkg-btn { margin: 4px 2px; border: none; border-radius: 12px; padding: 8px 18px; font-size: 1.05em; cursor: pointer; font-family: inherit; font-weight: bold; position: relative; overflow: hidden; transition: transform 0.15s, box-shadow 0.2s; letter-spacing: 1px; }
-    .pkg-btn:hover { transform: scale(1.07); }
-    .pkg-btn:active { transform: scale(0.97); }
-    .pkg-btn::after { content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:linear-gradient(120deg,rgba(255,255,255,0.18) 0%,rgba(255,255,255,0) 60%); transform:rotate(25deg); pointer-events:none; }
-    .pkg-1 { background:linear-gradient(90deg,#bf00ff,#7700cc); color:#fff; box-shadow:0 2px 16px #bf00ff55; }
-    .pkg-2 { background:linear-gradient(90deg,#00cfff,#0077aa); color:#000; box-shadow:0 2px 16px #00cfff55; }
-    .pkg-3 { background:linear-gradient(90deg,#ffd700,#ff9900); color:#000; box-shadow:0 2px 16px #ffd70055; }
-    .pkg-4 { background:linear-gradient(90deg,#ff3333,#cc0066); color:#fff; box-shadow:0 2px 16px #ff333355; }
-    .pkg-5 { background:linear-gradient(90deg,#00ff99,#00cc66); color:#000; box-shadow:0 2px 16px #00ff9955; }
-    .pkg-6 { background:linear-gradient(90deg,#bf00ff,#00cfff,#ffd700,#ff3333,#00ff99,#bf00ff); background-size:300% 100%; animation:pkgRainbow 2s linear infinite; color:#000; box-shadow:0 2px 24px #ffd70088; font-size:1.1em; }
-    @keyframes pkgRainbow { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
-    #spinsLeft { color: var(--gold); font-size: 1.1em; }
+/* ── DASHBOARD GRID ── */
+.dashboard{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;margin:16px 0;
+}
+.dash-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;padding:14px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.dash-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--n1),transparent);
+}
+.dash-val{
+  font-family:'Russo One',sans-serif;
+  font-size:22px;color:var(--n3);
+  text-shadow:0 0 12px rgba(255,204,0,0.6);
+}
+.dash-lbl{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:4px;
+}
 
-    /* STATS */
-    .stats-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 18px 0 8px 0; }
-    .stat-box { background: rgba(255,255,255,0.04); border: 1px solid #333; border-radius: 12px; padding: 8px 18px; text-align: center; min-width: 100px; }
-    .stat-box .stat-label { color: #888; font-size: 0.85em; letter-spacing: 1px; }
-    .stat-box .stat-val { color: var(--gold); font-size: 1.2em; }
+/* ── JACKPOT MARQUEE ── */
+.jackpot-bar{
+  background:linear-gradient(90deg,rgba(255,0,255,0.1),rgba(255,204,0,0.1),rgba(255,0,255,0.1));
+  border:2px solid var(--n1);
+  border-radius:12px;padding:12px 20px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin-bottom:16px;
+  animation:jackpotPulse 2.5s ease-in-out infinite;
+  position:relative;overflow:hidden;
+}
+.jackpot-bar::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,204,0,0.06),transparent);
+  animation:jackpotSweep 3s linear infinite;
+}
+@keyframes jackpotSweep{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes jackpotPulse{0%,100%{box-shadow:0 0 10px rgba(255,0,255,0.3)}50%{box-shadow:0 0 30px rgba(255,0,255,0.7),0 0 60px rgba(255,204,0,0.3)}}
+.jackpot-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--dim);}
+.jackpot-val{
+  font-family:'Russo One',sans-serif;font-size:24px;
+  color:var(--n3);text-shadow:0 0 16px rgba(255,204,0,0.8);
+}
+.jackpot-coin{font-size:20px;animation:coinSpin 2s linear infinite;}
+@keyframes coinSpin{0%{transform:rotateY(0deg)}50%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
 
-    /* LOG */
-    .log-wrap { margin: 18px 0 0 0; }
-    .log-title { color: #888; font-size: 0.95em; letter-spacing: 2px; text-align: center; margin-bottom: 6px; }
-    .log-list { max-height: 140px; overflow-y: auto; border: 1px solid #222; border-radius: 12px; padding: 6px 10px; background: rgba(0,0,0,0.3); }
-    .log-list::-webkit-scrollbar { width: 4px; } .log-list::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-    .log-entry { font-size: 0.95em; padding: 2px 0; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; }
-    .log-entry:last-child { border-bottom: none; }
-    .log-entry.win { color: var(--win); } .log-entry.jackpot { color: var(--jackpot); } .log-entry.lose { color: #666; }
+/* ── WALLET ── */
+.wallet-panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:16px 20px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.wallet-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.wallet-addr{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:var(--n3);letter-spacing:1px;
+}
+.wallet-bal{
+  font-family:'Share Tech Mono',monospace;font-size:13px;
+  color:var(--n6);font-weight:700;
+  text-shadow:0 0 8px rgba(0,255,136,0.5);
+}
 
-    /* NFT BADGE */
-    .nft-badge { display: none; margin: 14px auto 0; max-width: 340px; background: linear-gradient(90deg,#bf00ff22,#00ffff22); border: 2px solid var(--gold); border-radius: 16px; padding: 12px 24px; text-align: center; }
-    .nft-badge.show { display: block; animation: badgePop 0.4s cubic-bezier(.36,1.6,.6,1); }
-    @keyframes badgePop { 0%{transform:scale(0.5);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-    .nft-badge .nft-title { color: var(--gold); font-size: 1.3em; letter-spacing: 2px; }
-    .nft-badge .nft-sub { color: var(--blue); font-size: 1em; }
+/* ── NETWORK BAR ── */
+.network-bar{
+  display:none;background:rgba(255,51,0,0.1);
+  border:2px solid var(--n2);border-radius:12px;
+  padding:12px 20px;margin-bottom:14px;text-align:center;
+}
+.network-bar.show{display:block;}
+.network-bar p{color:#ff6644;margin:0 0 10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;}
 
-    /* FLASH */
-    .flash-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0; transition: opacity 0.15s; }
-    .flash-overlay.win-flash { background: radial-gradient(ellipse at center,#bf00ff44 0%,transparent 70%); }
-    .flash-overlay.jackpot-flash { background: radial-gradient(ellipse at center,#00ffff66 0%,transparent 70%); }
-    .flash-overlay.active { opacity: 1; }
+/* ── SLOT MACHINE ── */
+.slot-machine{
+  background:linear-gradient(180deg,#0d0015 0%,#060010 100%);
+  border:3px solid var(--n3);
+  border-radius:28px;padding:20px;margin-bottom:16px;
+  box-shadow:0 0 40px rgba(255,0,255,0.2),0 0 80px rgba(255,204,0,0.1),inset 0 0 40px rgba(0,0,0,0.8);
+  position:relative;overflow:hidden;
+}
+.slot-machine::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--n3),var(--n1),var(--n4),var(--n3),transparent);
+  animation:slotTop 2s linear infinite;
+}
+.slot-machine::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--n3),var(--n1),var(--n4),var(--n3),transparent);
+  animation:slotTop 2s linear infinite reverse;
+}
+@keyframes slotTop{0%{background-position:0% center}100%{background-position:200% center}}
 
-    /* RAIN */
-    .rain-container { position: fixed; inset: 0; pointer-events: none; z-index: 9997; overflow: hidden; }
-    .rain-sym { position: absolute; top: -60px; animation: rainFall linear forwards; opacity: 0.85; }
-    @keyframes rainFall { 0%{transform:translateY(0) rotate(0deg);opacity:0.85;} 100%{transform:translateY(110vh) rotate(360deg);opacity:0;} }
+/* SLOT TITLE BAR */
+.slot-titlebar{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  margin-bottom:16px;
+}
+.slot-neon-text{
+  font-family:'Russo One',sans-serif;font-size:18px;letter-spacing:6px;
+  color:var(--n1);text-shadow:0 0 10px var(--n1),0 0 20px var(--n1);
+  animation:neonFlicker 4s ease-in-out infinite;
+}
+@keyframes neonFlicker{
+  0%,90%,100%{opacity:1}
+  92%{opacity:0.4}
+  94%{opacity:1}
+  96%{opacity:0.3}
+  98%{opacity:1}
+}
+.slot-star{font-size:18px;animation:starSpin 3s linear infinite;}
+@keyframes starSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 32px; right: 24px; z-index: 9999; background: #181818; border: 1px solid var(--gold); border-radius: 14px; padding: 14px 22px; min-width: 220px; max-width: 340px; box-shadow: 0 4px 32px #00000088; transform: translateX(120%); transition: transform 0.35s cubic-bezier(.36,1.1,.6,1); }
-    .toast.show { transform: translateX(0); }
-    .toast-title { color: var(--gold); font-size: 1.1em; letter-spacing: 1px; }
-    .toast-body { color: #aaa; font-size: 0.95em; margin-top: 2px; font-family: monospace; }
+/* REELS */
+.reels-wrap{
+  display:flex;justify-content:center;align-items:center;
+  gap:12px;margin:12px 0;
+}
+.reel-col{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.reel{
+  width:clamp(90px,22vw,150px);
+  height:clamp(110px,26vw,180px);
+  background:linear-gradient(180deg,#0a0015,#050008);
+  border-radius:16px;
+  border:3px solid var(--n3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(2.8em,8vw,5em);
+  box-shadow:0 0 20px rgba(255,204,0,0.3),inset 0 0 20px rgba(0,0,0,0.8);
+  user-select:none;position:relative;overflow:hidden;
+  transition:box-shadow .2s,border-color .2s;
+}
+.reel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:40%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.08),transparent);
+  pointer-events:none;border-radius:14px 14px 0 0;
+}
+.reel-num{
+  font-family:'Russo One',sans-serif;font-size:11px;
+  color:var(--dim);letter-spacing:2px;
+}
 
-    /* ══════════════════════════════════════
-       NEAR INTENTS SWAP PANEL
-    ══════════════════════════════════════ */
-    .near-swap-wrap {
-      max-width: 900px; margin: 32px auto 0; padding: 0 12px;
-    }
-    .near-swap-card {
-      border-radius: 28px; padding: 32px 28px;
-      background: linear-gradient(135deg, #0a0a0a 70%, #001a1a 100%);
-      border: 2px solid transparent;
-      position: relative; overflow: hidden;
-    }
-    .near-swap-card::before {
-      content: "";
-      position: absolute; inset: 0; border-radius: 28px; padding: 2px;
-      background: linear-gradient(90deg, #bf00ff, #00C1DE, #ffd700, #00C1DE, #bf00ff);
-      background-size: 300% 100%;
-      animation: nearBorder 4s linear infinite;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out; mask-composite: exclude;
-      pointer-events: none;
-    }
-    @keyframes nearBorder { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
+/* REEL SEPARATOR */
+.reel-sep{
+  font-family:'Russo One',sans-serif;font-size:24px;
+  color:var(--n3);text-shadow:0 0 10px rgba(255,204,0,0.6);
+  opacity:0.5;
+}
 
-    .near-swap-card::after {
-      content: "";
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 15% 50%, #bf00ff0a 0%, transparent 55%),
-                  radial-gradient(ellipse at 85% 50%, #00C1DE0a 0%, transparent 55%);
-      pointer-events: none;
-    }
+/* ── BET ROW ── */
+.bet-section{
+  margin:14px 0 10px;
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+}
+.bet-lbl{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  letter-spacing:2px;color:var(--dim);
+}
+.bet-btn{
+  font-family:'Russo One',sans-serif;font-size:12px;
+  padding:8px 16px;border-radius:8px;border:1px solid rgba(255,204,0,0.3);
+  background:rgba(255,204,0,0.05);color:#ccc;
+  cursor:pointer;transition:all .2s;letter-spacing:1px;
+}
+.bet-btn:hover{border-color:var(--n3);color:var(--n3);}
+.bet-btn.active{
+  background:linear-gradient(135deg,rgba(255,204,0,0.2),rgba(255,0,255,0.1));
+  border-color:var(--n3);color:var(--n3);
+  box-shadow:0 0 12px rgba(255,204,0,0.3);
+}
 
-    .swap-inner { position: relative; z-index: 1; }
+/* ── PACKAGES ── */
+.pkg-section{
+  margin:14px 0;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+@media(max-width:600px){.pkg-section{grid-template-columns:repeat(2,1fr);}}
 
-    .swap-head {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px; flex-wrap: wrap; gap: 10px;
-    }
-    .swap-head-left { display: flex; align-items: center; gap: 12px; }
-    .near-pill {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(0,193,222,0.1); border: 1px solid rgba(0,193,222,0.35);
-      border-radius: 20px; padding: 5px 14px;
-      font-size: 0.75em; letter-spacing: 2px; color: var(--near);
-    }
-    .near-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--near); animation: nearBlink 2s ease-in-out infinite; }
-    @keyframes nearBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-    .swap-head-title {
-      font-size: 1.4em; letter-spacing: 5px;
-      background: linear-gradient(90deg, #00C1DE, #ffd700, #bf00ff);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .swap-head-sub { font-size: 0.75em; color: #666; letter-spacing: 1px; font-family: monospace; }
+.pkg-btn{
+  font-family:'Russo One',sans-serif;font-size:11px;letter-spacing:1px;
+  padding:10px 8px;border-radius:10px;border:none;
+  cursor:pointer;transition:transform .15s,box-shadow .2s;
+  position:relative;overflow:hidden;text-align:center;line-height:1.3;
+}
+.pkg-btn:hover{transform:scale(1.04);}
+.pkg-btn:active{transform:scale(0.96);}
+.pkg-btn::after{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:linear-gradient(120deg,rgba(255,255,255,0.15) 0%,rgba(255,255,255,0) 60%);
+  transform:rotate(25deg);pointer-events:none;
+}
+.pkg-1{background:linear-gradient(135deg,#330066,#660099);color:#dd88ff;box-shadow:0 2px 16px rgba(102,0,153,0.5);}
+.pkg-2{background:linear-gradient(135deg,#003366,#0066aa);color:#88ccff;box-shadow:0 2px 16px rgba(0,102,170,0.5);}
+.pkg-3{background:linear-gradient(135deg,#664400,#cc8800);color:#ffdd88;box-shadow:0 2px 16px rgba(204,136,0,0.5);}
+.pkg-4{background:linear-gradient(135deg,#660022,#cc0044);color:#ff88aa;box-shadow:0 2px 16px rgba(204,0,68,0.5);}
+.pkg-5{background:linear-gradient(135deg,#003322,#006644);color:#88ffcc;box-shadow:0 2px 16px rgba(0,102,68,0.5);}
+.pkg-6{
+  background:linear-gradient(135deg,#330044,#660022,#664400,#003322,#003366,#330044);
+  background-size:300% 100%;animation:pkgRainbow 2s linear infinite;
+  color:#fff;box-shadow:0 2px 24px rgba(255,204,0,0.4);
+  grid-column:1/-1;font-size:12px;
+}
+@keyframes pkgRainbow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
 
-    /* Token boxes */
-    .swap-token-box {
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 16px; padding: 14px 18px; margin-bottom: 6px;
-      transition: border-color 0.2s;
-    }
-    .swap-token-box:focus-within { border-color: rgba(0,193,222,0.4); box-shadow: 0 0 0 3px rgba(0,193,222,0.05); }
-    .swap-box-label { font-size: 0.65em; color: #555; letter-spacing: 2px; margin-bottom: 8px; }
-    .swap-token-row { display: flex; align-items: center; gap: 12px; }
-    .swap-amount-input {
-      flex: 1; background: transparent; border: none; outline: none;
-      font-family: 'Bebas Neue', sans-serif; font-size: 2em; color: white; width: 100%;
-    }
-    .swap-amount-input::placeholder { color: rgba(255,255,255,0.12); }
-    .swap-amount-input[readonly] { color: rgba(255,255,255,0.45); }
-    .swap-tok-select {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; padding: 8px 14px; cursor: pointer;
-      transition: all 0.2s; flex-shrink: 0;
-      font-family: 'Bebas Neue', sans-serif; font-size: 0.9em; color: white;
-      white-space: nowrap; letter-spacing: 1px;
-    }
-    .swap-tok-select:hover { background: rgba(0,193,222,0.08); border-color: rgba(0,193,222,0.35); }
-    .swap-tok-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: bold; flex-shrink: 0; }
-    .swap-usd { font-size: 0.7em; color: #444; margin-top: 6px; font-family: monospace; }
+.spins-badge{
+  text-align:center;margin:8px 0;
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:var(--n3);text-shadow:0 0 8px rgba(255,204,0,0.5);
+  letter-spacing:2px;
+}
 
-    /* Arrow */
-    .swap-arrow-row { display: flex; justify-content: center; margin: 4px 0; }
-    .swap-arrow-btn {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: #111; border: 1px solid rgba(0,193,222,0.3);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1.1em; color: var(--near);
-      transition: all 0.25s;
-    }
-    .swap-arrow-btn:hover { background: rgba(0,193,222,0.1); box-shadow: var(--near-glow); transform: rotate(180deg); }
+/* ── SPIN BUTTON ── */
+.spin-btn{
+  width:100%;
+  font-family:'Russo One',sans-serif;font-size:clamp(16px,4vw,22px);
+  letter-spacing:6px;padding:18px;border-radius:16px;border:none;
+  cursor:pointer;position:relative;overflow:hidden;
+  margin:12px 0;
+  background:linear-gradient(90deg,#1a0033,#330066,#ff00ff,#ff3300,#ffcc00,#ff3300,#ff00ff,#330066,#1a0033);
+  background-size:300% 100%;animation:spinBtnGlow 3s linear infinite;
+  color:#fff;
+  box-shadow:0 0 30px rgba(255,0,255,0.5),0 0 60px rgba(255,0,255,0.2);
+  transition:box-shadow .2s,filter .2s;
+}
+.spin-btn:hover:not(:disabled){
+  filter:brightness(1.2);
+  box-shadow:0 0 50px rgba(255,0,255,0.8),0 0 100px rgba(255,0,255,0.3);
+}
+.spin-btn:disabled{
+  background:linear-gradient(90deg,#111,#222);
+  color:#333;box-shadow:none;cursor:not-allowed;animation:none;
+}
+.spin-btn.loading{
+  background:linear-gradient(90deg,#0a0a0a,#1a1a1a);
+  color:#555;box-shadow:none;cursor:not-allowed;animation:none;
+}
+@keyframes spinBtnGlow{0%{background-position:0% center}100%{background-position:300% center}}
+.spin-spinner{
+  width:20px;height:20px;border:3px solid rgba(255,255,255,0.2);
+  border-top:3px solid var(--n1);border-radius:50%;
+  animation:doSpin 1s linear infinite;display:inline-block;vertical-align:middle;
+}
+@keyframes doSpin{to{transform:rotate(360deg)}}
 
-    /* Quote box */
-    .swap-quote-box {
-      background: rgba(0,193,222,0.04); border: 1px solid rgba(0,193,222,0.15);
-      border-radius: 12px; padding: 14px 18px; margin: 14px 0; display: none;
-    }
-    .swap-quote-box.show { display: block; }
-    .swap-qrow {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.75em; color: #555; margin-bottom: 6px; font-family: monospace;
-    }
-    .swap-qrow:last-child { margin-bottom: 0; }
-    .swap-qrow span:last-child { color: rgba(255,255,255,0.65); }
-    .swap-qrow.hl span:last-child { color: var(--near); font-size: 1.1em; }
+/* ── STATUS ── */
+.status-bar{
+  text-align:center;min-height:32px;margin:8px 0;
+  font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;
+  padding:8px 12px;border-radius:8px;
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,0,255,0.1);
+  transition:all .3s;
+}
+.status-bar.win{color:var(--win);border-color:rgba(255,0,255,0.4);text-shadow:0 0 8px rgba(255,0,255,0.5);}
+.status-bar.jackpot{color:var(--jackpot);border-color:rgba(255,204,0,0.4);text-shadow:0 0 8px rgba(255,204,0,0.5);}
+.status-bar.lose{color:var(--lose);border-color:rgba(255,51,0,0.3);}
+.txlink{color:var(--n4);font-size:10px;word-break:break-all;}
 
-    /* Token dropdown */
-    .swap-tok-dropdown { position: relative; display: inline-block; }
-    .swap-dropdown-menu {
-      position: absolute; top: calc(100% + 6px); right: 0;
-      background: #111; border: 1px solid rgba(0,193,222,0.25);
-      border-radius: 12px; min-width: 170px; z-index: 200; display: none; overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.9);
-    }
-    .swap-dropdown-menu.open { display: block; }
-    .swap-dd-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 16px; cursor: pointer; transition: background 0.15s;
-      font-family: 'Bebas Neue', sans-serif; font-size: 0.9em; letter-spacing: 1px;
-    }
-    .swap-dd-item:hover { background: rgba(0,193,222,0.08); }
-    .swap-dd-sym { color: white; }
-    .swap-dd-name { font-size: 0.7em; color: #555; font-family: monospace; letter-spacing: 0; }
+/* ── STATS DASHBOARD ── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;
+}
+@media(max-width:500px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:12px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--n1),transparent);
+}
+.stat-v{
+  font-family:'Russo One',sans-serif;font-size:18px;
+  color:var(--n3);text-shadow:0 0 8px rgba(255,204,0,0.4);
+}
+.stat-l{
+  font-family:'Share Tech Mono',monospace;font-size:8px;
+  color:var(--dim);letter-spacing:2px;margin-top:3px;
+}
 
-    /* Buttons */
-    .swap-quote-btn, .swap-exec-btn {
-      width: 100%; padding: 16px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.2em; letter-spacing: 4px; border-radius: 14px;
-      cursor: pointer; transition: all 0.25s; margin-bottom: 10px;
-    }
-    .swap-quote-btn {
-      background: transparent; border: 2px solid rgba(0,193,222,0.5); color: var(--near);
-    }
-    .swap-quote-btn:hover { background: rgba(0,193,222,0.08); box-shadow: var(--near-glow); }
-    .swap-exec-btn {
-      background: transparent; border: 2px solid var(--gold); color: var(--gold); display: none;
-    }
-    .swap-exec-btn.show { display: block; }
-    .swap-exec-btn:hover { background: rgba(255,215,0,0.08); box-shadow: 0 0 20px #ffd70055; }
-    .swap-exec-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+/* ── LOG ── */
+.log-section{margin:14px 0;}
+.log-title{
+  font-family:'Share Tech Mono',monospace;font-size:9px;
+  letter-spacing:3px;color:var(--dim);text-align:center;margin-bottom:8px;
+}
+.log-list{
+  max-height:130px;overflow-y:auto;
+  border:1px solid rgba(255,0,255,0.1);border-radius:10px;
+  padding:6px 10px;background:rgba(0,0,0,0.4);
+}
+.log-list::-webkit-scrollbar{width:3px;}
+.log-list::-webkit-scrollbar-thumb{background:rgba(255,0,255,0.3);border-radius:3px;}
+.log-entry{
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  padding:4px 0;border-bottom:1px solid rgba(255,0,255,0.05);
+  display:flex;justify-content:space-between;
+}
+.log-entry:last-child{border-bottom:none;}
+.log-entry.win{color:var(--n1);}
+.log-entry.jackpot{color:var(--n3);}
+.log-entry.lose{color:#444;}
 
-    /* Swap status */
-    .swap-msg {
-      font-size: 0.85em; text-align: center; padding: 10px 14px;
-      border-radius: 10px; margin-top: 6px; display: none; font-family: monospace; letter-spacing: 1px;
-    }
-    .swap-msg.info { display: block; color: var(--near); background: rgba(0,193,222,0.06); border: 1px solid rgba(0,193,222,0.2); }
-    .swap-msg.success { display: block; color: #00ff99; background: rgba(0,255,153,0.06); border: 1px solid rgba(0,255,153,0.2); }
-    .swap-msg.error { display: block; color: #ff3333; background: rgba(255,51,51,0.06); border: 1px solid rgba(255,51,51,0.2); }
+/* ── NFT BADGE ── */
+.nft-badge{
+  display:none;margin:12px auto;max-width:320px;
+  background:linear-gradient(90deg,rgba(255,0,255,0.15),rgba(0,255,255,0.15));
+  border:2px solid var(--n3);border-radius:14px;padding:14px 20px;text-align:center;
+}
+.nft-badge.show{display:block;animation:badgePop .4s cubic-bezier(.36,1.6,.6,1);}
+@keyframes badgePop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.nft-title{color:var(--n3);font-size:18px;letter-spacing:3px;font-family:'Russo One',sans-serif;}
+.nft-sub{color:var(--n4);font-family:'Share Tech Mono',monospace;font-size:11px;margin-top:4px;}
 
-    /* Powered by */
-    .swap-powered {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      margin-top: 18px; font-size: 0.65em; color: #444; letter-spacing: 2px; font-family: monospace;
-    }
-    .swap-powered a { color: var(--near); text-decoration: none; }
-    .swap-powered a:hover { text-shadow: var(--near-glow); }
+/* ── SWAP PANEL ── */
+.swap-panel{
+  background:var(--panel);border:1px solid rgba(0,193,222,0.25);
+  border-radius:18px;padding:22px;margin:16px 0;
+  position:relative;overflow:hidden;
+}
+.swap-panel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,#00C1DE,transparent);
+}
+.swap-title{
+  font-family:'Russo One',sans-serif;font-size:14px;letter-spacing:4px;
+  color:#00C1DE;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.near-pill{
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;
+  background:rgba(0,193,222,0.1);border:1px solid rgba(0,193,222,0.3);
+  border-radius:12px;padding:3px 10px;color:#00C1DE;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.near-dot{width:6px;height:6px;border-radius:50%;background:#00C1DE;animation:nearBlink 2s ease-in-out infinite;}
+@keyframes nearBlink{0%,100%{opacity:1}50%{opacity:.2}}
 
-    /* DONATE BANNER */
-    .donate-banner { max-width: 900px; margin: 28px auto 0; padding: 0 12px; }
-    .donate-inner {
-      border-radius: 20px; padding: 22px 28px;
-      background: linear-gradient(90deg, #0a0a0a 0%, #1a002a 30%, #001a2a 60%, #0a0a0a 100%);
-      border: 2px solid transparent; background-clip: padding-box;
-      position: relative; overflow: hidden; text-align: center;
-    }
-    .donate-inner::before {
-      content: ""; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
-      background: linear-gradient(90deg, #bf00ff, #00ffff, #ffd700, #ff0080, #bf00ff);
-      background-size: 300% 100%; animation: donateBorder 4s linear infinite;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out; mask-composite: exclude; pointer-events: none;
-    }
-    @keyframes donateBorder { 0%{background-position:0% 50%;} 100%{background-position:100% 50%;} }
-    .donate-inner::after {
-      content: ""; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 20% 50%, #bf00ff18 0%, transparent 60%),
-                  radial-gradient(ellipse at 80% 50%, #00ffff18 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .donate-title {
-      font-size: 1.6em; letter-spacing: 6px; margin: 0 0 6px 0;
-      background: linear-gradient(90deg, #ffd700, #ff0080, #bf00ff, #00ffff, #ffd700);
-      background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: titleRainbow 3s linear infinite; position: relative; z-index: 1;
-    }
-    .donate-sub { color: #aaa; font-size: 0.95em; margin: 0 0 16px 0; letter-spacing: 1px; font-family: Arial, sans-serif; position: relative; z-index: 1; }
-    .donate-btn {
-      display: inline-block;
-      background: linear-gradient(90deg, #bf00ff, #00cfff, #ffd700, #bf00ff);
-      background-size: 300% 100%; animation: pkgRainbow 2s linear infinite;
-      color: #000; font-family: 'Bebas Neue', sans-serif; font-size: 1.3em;
-      letter-spacing: 3px; border: none; border-radius: 32px; padding: 14px 40px;
-      cursor: pointer; text-decoration: none;
-      box-shadow: 0 0 32px #bf00ff55, 0 0 64px #00ffff22;
-      transition: transform 0.2s, box-shadow 0.2s; position: relative; z-index: 1;
-    }
-    .donate-btn:hover { transform: scale(1.06); box-shadow: 0 0 48px #bf00ff88, 0 0 80px #00ffff44; }
-    .donate-coins { font-size: 1.5em; margin: 0 6px; vertical-align: middle; }
-    .footer { text-align: center; color: #444; font-size: 1em; margin: 32px 0 16px 0; }
-    .footer a { color: var(--neon); }
+.swap-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.swap-input-box{
+  flex:1;min-width:120px;
+  background:rgba(0,193,222,0.04);border:1px solid rgba(0,193,222,0.15);
+  border-radius:10px;padding:10px 14px;
+}
+.swap-input-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#446;letter-spacing:2px;margin-bottom:4px;}
+.swap-input{
+  width:100%;background:transparent;border:none;outline:none;
+  font-family:'Russo One',sans-serif;font-size:18px;color:#fff;
+}
+.swap-input::placeholder{color:rgba(255,255,255,0.1);}
+.swap-input[readonly]{color:rgba(255,255,255,0.4);}
+.swap-usd{font-family:'Share Tech Mono',monospace;font-size:10px;color:#334;margin-top:4px;}
 
-    @media (max-width: 700px) {
-      .container { max-width: 99vw; padding: 24px 2vw 24px; }
-      .reel { width: 90px; height: 120px; font-size: 2.8em; }
-      .reels { gap: 12px; padding: 8px 0; margin: 24px 0 16px 0; }
-      h1 { font-size: 2em; letter-spacing: 4px; }
-      .donate-btn { font-size: 1.1em; padding: 12px 24px; }
-      .near-swap-card { padding: 22px 14px; }
-    }
-  </style>
+.swap-tok-sel{
+  background:rgba(0,193,222,0.06);border:1px solid rgba(0,193,222,0.2);
+  border-radius:8px;padding:8px 12px;cursor:pointer;
+  font-family:'Russo One',sans-serif;font-size:11px;color:#fff;letter-spacing:1px;
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+  transition:background .2s;
+}
+.swap-tok-sel:hover{background:rgba(0,193,222,0.12);}
+.swap-tok-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
+
+.swap-tok-dropdown{position:relative;}
+.swap-dropdown-menu{
+  position:absolute;top:calc(100% + 4px);right:0;
+  background:#0d0018;border:1px solid rgba(0,193,222,0.2);
+  border-radius:10px;min-width:160px;z-index:200;display:none;overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,0.9);
+}
+.swap-dropdown-menu.open{display:block;}
+.swap-dd-item{
+  display:flex;align-items:center;gap:8px;padding:9px 14px;
+  cursor:pointer;transition:background .15s;
+  font-family:'Russo One',sans-serif;font-size:11px;letter-spacing:1px;
+}
+.swap-dd-item:hover{background:rgba(0,193,222,0.08);}
+.swap-dd-name{font-family:'Share Tech Mono',monospace;font-size:9px;color:#446;letter-spacing:0;}
+
+.swap-arrow-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,193,222,0.08);border:1px solid rgba(0,193,222,0.25);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#00C1DE;font-size:16px;flex-shrink:0;
+  transition:all .25s;
+}
+.swap-arrow-btn:hover{background:rgba(0,193,222,0.15);transform:rotate(180deg);}
+
+.swap-quote-box{
+  background:rgba(0,193,222,0.04);border:1px solid rgba(0,193,222,0.12);
+  border-radius:10px;padding:12px;margin:10px 0;display:none;
+}
+.swap-quote-box.show{display:block;}
+.swap-qrow{
+  display:flex;justify-content:space-between;
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:#446;margin-bottom:4px;
+}
+.swap-qrow:last-child{margin-bottom:0;}
+.swap-qrow span:last-child{color:rgba(255,255,255,0.6);}
+.swap-qrow.hl span:last-child{color:#00C1DE;}
+
+.swap-msg{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  text-align:center;padding:8px 12px;border-radius:8px;margin-top:8px;display:none;letter-spacing:1px;
+}
+.swap-msg.info{display:block;color:#00C1DE;background:rgba(0,193,222,0.06);border:1px solid rgba(0,193,222,0.15);}
+.swap-msg.success{display:block;color:#00ff99;background:rgba(0,255,153,0.06);border:1px solid rgba(0,255,153,0.15);}
+.swap-msg.error{display:block;color:#ff3333;background:rgba(255,51,51,0.06);border:1px solid rgba(255,51,51,0.15);}
+
+.swap-powered{
+  text-align:center;font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:#334;letter-spacing:2px;margin-top:12px;
+}
+.swap-powered a{color:#00C1DE;text-decoration:none;}
+
+/* ── BUTTONS COMMON ── */
+.btn{
+  font-family:'Russo One',sans-serif;font-size:12px;letter-spacing:2px;
+  padding:12px 20px;border-radius:10px;border:none;cursor:pointer;
+  transition:filter .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.btn:hover:not(:disabled){filter:brightness(1.18);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+.btn-connect{
+  background:linear-gradient(135deg,#001a00,#003300,#00ff66);
+  color:#000;box-shadow:0 4px 16px rgba(0,255,102,0.35);
+  border:1px solid rgba(0,255,102,0.3);
+}
+.btn-connect.connected{
+  background:rgba(0,0,0,0.5);color:#00ff66;
+  border:1px solid rgba(0,255,102,0.3);cursor:default;
+}
+
+.btn-switch{
+  background:linear-gradient(135deg,#330000,#660000,#ff3300);
+  color:#fff;box-shadow:0 4px 16px rgba(255,51,0,0.3);
+}
+
+.btn-quote{
+  width:100%;margin-bottom:8px;
+  background:transparent;border:2px solid rgba(0,193,222,0.4);color:#00C1DE;
+}
+.btn-quote:hover:not(:disabled){background:rgba(0,193,222,0.08);}
+
+.btn-exec{
+  width:100%;
+  background:transparent;border:2px solid var(--n3);color:var(--n3);
+  display:none;
+}
+.btn-exec.show{display:block;}
+.btn-exec:hover:not(:disabled){background:rgba(255,204,0,0.08);}
+
+/* ── DONATE ── */
+.donate-panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:20px;margin:16px 0;
+  text-align:center;position:relative;overflow:hidden;
+}
+.donate-panel::before{
+  content:'';position:absolute;inset:0;border-radius:16px;padding:2px;
+  background:linear-gradient(90deg,#ff00ff,#00ffff,#ffcc00,#ff3300,#ff00ff);
+  background-size:300% 100%;animation:donateBorder 4s linear infinite;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out;mask-composite:exclude;pointer-events:none;
+}
+@keyframes donateBorder{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+
+.donate-title{
+  font-family:'Russo One',sans-serif;font-size:18px;letter-spacing:4px;
+  background:linear-gradient(90deg,#ff00ff,#ffcc00,#00ffff,#ff00ff);
+  background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:titleRainbow 3s linear infinite;margin-bottom:8px;
+}
+.donate-sub{
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);
+  letter-spacing:1px;margin-bottom:14px;
+}
+.donate-btn{
+  display:inline-block;
+  background:linear-gradient(90deg,#ff00ff,#00ffff,#ffcc00,#ff00ff);
+  background-size:300% 100%;animation:pkgRainbow 2s linear infinite;
+  color:#000;font-family:'Russo One',sans-serif;font-size:14px;letter-spacing:3px;
+  border:none;border-radius:24px;padding:14px 36px;cursor:pointer;text-decoration:none;
+  box-shadow:0 0 24px rgba(255,0,255,0.5);transition:transform .2s,box-shadow .2s;
+}
+.donate-btn:hover{transform:scale(1.05);box-shadow:0 0 40px rgba(255,0,255,0.8);}
+
+/* ── FOOTER ── */
+.footer{
+  text-align:center;color:var(--dim);
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  letter-spacing:1px;margin:20px 0 12px;
+}
+.footer a{color:var(--n1);}
+
+/* ── FLASH / RAIN / TOAST ── */
+.flash-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;transition:opacity .15s;}
+.flash-overlay.win-flash{background:radial-gradient(ellipse at center,rgba(255,0,255,0.35) 0%,transparent 70%);}
+.flash-overlay.jackpot-flash{background:radial-gradient(ellipse at center,rgba(255,204,0,0.5) 0%,transparent 70%);}
+.flash-overlay.active{opacity:1;}
+.rain-container{position:fixed;inset:0;pointer-events:none;z-index:9997;overflow:hidden;}
+.rain-sym{position:absolute;top:-60px;animation:rainFall linear forwards;opacity:.85;}
+@keyframes rainFall{0%{transform:translateY(0) rotate(0deg);opacity:.85}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
+.toast{
+  position:fixed;bottom:24px;right:20px;z-index:9999;
+  background:#0d0018;border:1px solid var(--n1);
+  border-radius:12px;padding:12px 18px;min-width:200px;max-width:300px;
+  box-shadow:0 4px 24px rgba(255,0,255,0.4);
+  transform:translateX(120%);transition:transform .35s cubic-bezier(.36,1.1,.6,1);
+}
+.toast.show{transform:translateX(0);}
+.toast-title{color:var(--n3);font-family:'Russo One',sans-serif;font-size:13px;letter-spacing:2px;}
+.toast-body{color:#888;font-family:'Share Tech Mono',monospace;font-size:10px;margin-top:2px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .dashboard{grid-template-columns:repeat(3,1fr);}
+  .wallet-panel{flex-direction:column;align-items:flex-start;}
+  .lv-title{font-size:28px;}
+}
+</style>
 </head>
 <body>
-  <div class="flash-overlay" id="flashOverlay"></div>
-  <div class="rain-container" id="rainContainer"></div>
-  <div class="toast" id="toast"><div class="toast-title" id="toastTitle"></div><div class="toast-body" id="toastBody"></div></div>
 
-  <!-- GAME BANNER -->
-  <div class="banner-wrap">
-    <img src="https://files.catbox.moe/1ueks9.png" alt="JOKER 777 Banner" />
+<div class="flash-overlay" id="flashOverlay"></div>
+<div class="rain-container" id="rainContainer"></div>
+<div class="toast" id="toast">
+  <div class="toast-title" id="toastTitle"></div>
+  <div class="toast-body" id="toastBody"></div>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="lv-header">
+    <img src="https://files.catbox.moe/1ueks9.png" alt="JOKER 777" class="lv-banner"/>
+    <div class="lv-title">🃏 JOKER 777 🎰</div>
+    <div class="lv-sub">WIN MON & NFTs · MONAD MAINNET · LAS VEGAS STYLE</div>
   </div>
 
-  <div class="container">
-    <h1>🃏 JOKER 777 SLOT 🃏</h1>
-    <div class="brand">⚡ Win MON &amp; NFTs · Monad Mainnet ⚡</div>
+  <!-- DASHBOARD TOP -->
+  <div class="dashboard" style="margin-top:16px;">
+    <div class="dash-card">
+      <div class="dash-val" id="statSpins">0</div>
+      <div class="dash-lbl">TOTAL SPINS</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-val" id="statWins">0</div>
+      <div class="dash-lbl">TOTAL WINS</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-val" id="statWon">0</div>
+      <div class="dash-lbl">MON WON</div>
+    </div>
+  </div>
 
-    <!-- WALLET ROW -->
-    <div class="wallet-row">
-      <button id="btnConnect" class="wallet-btn">
-        <img src="https://cryptologos.cc/logos/metamask-fox-logo.png" class="wallet-logo" alt="Wallet" />
-        <span id="connLabel">Connect Wallet</span>
+  <!-- JACKPOT BAR -->
+  <div class="jackpot-bar">
+    <span class="jackpot-coin">🪙</span>
+    <span class="jackpot-label">JACKPOT POOL</span>
+    <span class="jackpot-val" id="jackpotVal">0.0000</span>
+    <span class="jackpot-label">MON</span>
+    <span class="jackpot-coin">🪙</span>
+  </div>
+
+  <!-- WALLET -->
+  <div class="wallet-panel">
+    <div class="wallet-left">
+      <button id="btnConnect" class="btn btn-connect">
+        🦊 CONNECT WALLET
       </button>
       <span id="walletAddr" class="wallet-addr"></span>
       <span id="walletBal" class="wallet-bal"></span>
     </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:2px;" id="network-indicator">MONAD MAINNET</div>
+  </div>
 
-    <!-- NETWORK WARNING -->
-    <div class="network-bar" id="networkBar">
-      <p>⚠️ Wrong network — Please switch to Monad Mainnet (Chain ID: 143)</p>
-      <button class="switch-network-btn" id="switchNetworkBtn">🔄 Switch to Monad Mainnet</button>
+  <!-- NETWORK BAR -->
+  <div class="network-bar" id="networkBar">
+    <p>⚠️ WRONG NETWORK — SWITCH TO MONAD MAINNET (CHAIN ID: 143)</p>
+    <button class="btn btn-switch" id="switchNetworkBtn">🔄 SWITCH TO MONAD</button>
+  </div>
+
+  <!-- SLOT MACHINE -->
+  <div class="slot-machine">
+    <div class="slot-titlebar">
+      <span class="slot-star">⭐</span>
+      <span class="slot-neon-text">LUCKY SPINS</span>
+      <span class="slot-star">⭐</span>
     </div>
 
-    <div class="jackpot">🎰 Jackpot Pool: <span class="val" id="jackpotVal">0.00</span> MON</div>
-
-    <div class="slot-frame">
-      <div class="reels">
+    <div class="reels-wrap">
+      <div class="reel-col">
         <div class="reel" id="reel0">🃏</div>
+        <div class="reel-num">REEL 1</div>
+      </div>
+      <div class="reel-sep">✦</div>
+      <div class="reel-col">
         <div class="reel" id="reel1">7️⃣</div>
+        <div class="reel-num">REEL 2</div>
+      </div>
+      <div class="reel-sep">✦</div>
+      <div class="reel-col">
         <div class="reel" id="reel2">💎</div>
+        <div class="reel-num">REEL 3</div>
       </div>
     </div>
 
-    <div class="bet-row" id="betRow"></div>
-
-    <div class="package-row">
-      <button class="pkg-btn pkg-1" onclick="buyPackage(100,1000)">100 Spins / 1000 MON</button>
-      <button class="pkg-btn pkg-2" onclick="buyPackage(200,2000)">200 Spins / 2000 MON</button>
-      <button class="pkg-btn pkg-3" onclick="buyPackage(300,3000)">300 Spins / 3000 MON</button>
-      <button class="pkg-btn pkg-4" onclick="buyPackage(400,5000)">400 Spins / 5000 MON</button>
-      <button class="pkg-btn pkg-5" onclick="buyPackage(500,10000)">500 Spins / 10000 MON</button>
-      <button class="pkg-btn pkg-6" onclick="buyPackage(1000,100000)">⭐ 1000 Spins / 100000 MON ⭐</button>
+    <!-- BETS -->
+    <div class="bet-section">
+      <span class="bet-lbl">BET:</span>
+      <div id="betRow"></div>
     </div>
 
-    <div style="text-align:center; margin: 8px 0;"><span id="spinsLeft">Spins left: 0</span></div>
+    <!-- PACKAGES -->
+    <div class="pkg-section" id="pkgSection">
+      <button class="pkg-btn pkg-1" onclick="buyPackage(100,1000)">100 SPINS<br><small>1,000 MON</small></button>
+      <button class="pkg-btn pkg-2" onclick="buyPackage(200,2000)">200 SPINS<br><small>2,000 MON</small></button>
+      <button class="pkg-btn pkg-3" onclick="buyPackage(300,3000)">300 SPINS<br><small>3,000 MON</small></button>
+      <button class="pkg-btn pkg-4" onclick="buyPackage(400,5000)">400 SPINS<br><small>5,000 MON</small></button>
+      <button class="pkg-btn pkg-5" onclick="buyPackage(500,10000)">500 SPINS<br><small>10,000 MON</small></button>
+      <button class="pkg-btn pkg-6" onclick="buyPackage(1000,100000)">⭐ 1000 SPINS — 100,000 MON ⭐</button>
+    </div>
 
-    <button id="btnSpin" class="spin-btn" disabled><span id="spinBtnText">SPIN</span></button>
+    <div class="spins-badge" id="spinsLeft">SPINS REMAINING: 0</div>
 
-    <div class="status" id="status"></div>
-    <div id="txRow" style="text-align:center; margin-top:6px;"></div>
+    <button id="btnSpin" class="spin-btn" disabled>
+      <span id="spinBtnText">🎰 SPIN 🎰</span>
+    </button>
+
+    <div class="status-bar" id="status">Connect wallet to start spinning!</div>
+    <div id="txRow" style="text-align:center;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:10px;"></div>
 
     <!-- NFT BADGE -->
     <div class="nft-badge" id="nftBadge">
       <div class="nft-title" id="nftTitle">🏆 NFT MINTED!</div>
       <div class="nft-sub" id="nftSub">Jackpot Winner Badge</div>
     </div>
+  </div>
 
-    <!-- STATS -->
-    <div class="stats-row">
-      <div class="stat-box"><div class="stat-label">SPINS</div><div class="stat-val" id="statSpins">0</div></div>
-      <div class="stat-box"><div class="stat-label">WINS</div><div class="stat-val" id="statWins">0</div></div>
-      <div class="stat-box"><div class="stat-label">TOTAL BET</div><div class="stat-val" id="statBet">0 MON</div></div>
-      <div class="stat-box"><div class="stat-label">TOTAL WON</div><div class="stat-val" id="statWon">0 MON</div></div>
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-v" id="statBet">0</div>
+      <div class="stat-l">TOTAL BET (MON)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-v" id="statWonFull">0</div>
+      <div class="stat-l">TOTAL WON (MON)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-v" id="statWR">0%</div>
+      <div class="stat-l">WIN RATE</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-v" id="statProfit">0</div>
+      <div class="stat-l">NET PROFIT</div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-section">
+    <div class="log-title">📋 RECENT RESULTS</div>
+    <div class="log-list" id="logList">
+      <div class="log-entry lose"><span>No spins yet — connect wallet to play!</span><span></span></div>
+    </div>
+  </div>
+
+  <!-- SWAP PANEL -->
+  <div class="swap-panel">
+    <div class="swap-title">
+      <div class="near-pill"><div class="near-dot"></div>NEAR INTENTS</div>
+      ⇄ SWAP TO MON
     </div>
 
-    <!-- LOG -->
-    <div class="log-wrap">
-      <div class="log-title">📋 RECENT RESULTS</div>
-      <div class="log-list" id="logList">
-        <div class="log-entry lose"><span>No spins yet</span><span></span></div>
+    <div class="swap-row">
+      <div class="swap-input-box" style="flex:1">
+        <div class="swap-input-label">FROM</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input class="swap-input" id="swapAmtIn" type="number" placeholder="0.00" oninput="onSwapAmt()">
+          <div class="swap-tok-dropdown">
+            <div class="swap-tok-sel" onclick="toggleSwapDd('from')">
+              <div class="swap-tok-icon" id="swapFromIcon" style="background:#627EEA20;color:#627EEA">Ξ</div>
+              <span id="swapFromSym">ETH</span>
+              <span style="color:#334;font-size:10px">▾</span>
+            </div>
+            <div class="swap-dropdown-menu" id="swapFromDd"></div>
+          </div>
+        </div>
+        <div class="swap-usd" id="swapFromUsd">≈ $0.00</div>
+      </div>
+      <div class="swap-arrow-btn" onclick="flipSwap()">⇅</div>
+      <div class="swap-input-box" style="flex:1">
+        <div class="swap-input-label">TO (EST.)</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input class="swap-input" id="swapAmtOut" placeholder="0.00" readonly>
+          <div class="swap-tok-dropdown">
+            <div class="swap-tok-sel" onclick="toggleSwapDd('to')">
+              <div class="swap-tok-icon" id="swapToIcon" style="background:#ff00ff20;color:#ff00ff">M</div>
+              <span id="swapToSym">MON</span>
+              <span style="color:#334;font-size:10px">▾</span>
+            </div>
+            <div class="swap-dropdown-menu" id="swapToDd"></div>
+          </div>
+        </div>
+        <div class="swap-usd" id="swapToUsd">≈ $0.00</div>
       </div>
     </div>
-  </div>
 
-  <!-- ══════════════════════════════════════
-       NEAR INTENTS 1-CLICK SWAP PANEL
-  ══════════════════════════════════════ -->
-  <div class="near-swap-wrap">
-    <div class="near-swap-card">
-      <div class="swap-inner">
-
-        <div class="swap-head">
-          <div class="swap-head-left">
-            <div class="near-pill"><div class="near-dot"></div>NEAR INTENTS</div>
-            <div class="swap-head-title">⇄ SWAP TO MON</div>
-          </div>
-          <div class="swap-head-sub">Swap any token → MON before spinning</div>
-        </div>
-
-        <!-- FROM -->
-        <div class="swap-token-box">
-          <div class="swap-box-label">FROM</div>
-          <div class="swap-token-row">
-            <input class="swap-amount-input" id="swapAmtIn" type="number" placeholder="0.00" oninput="onSwapAmt()">
-            <div class="swap-tok-dropdown">
-              <div class="swap-tok-select" onclick="toggleSwapDd('from')">
-                <div class="swap-tok-icon" id="swapFromIcon" style="background:#62A5EA20;color:#627EEA">Ξ</div>
-                <span id="swapFromSym">ETH</span>
-                <span style="color:#444;font-size:0.7em">▾</span>
-              </div>
-              <div class="swap-dropdown-menu" id="swapFromDd"></div>
-            </div>
-          </div>
-          <div class="swap-usd" id="swapFromUsd">≈ $0.00</div>
-        </div>
-
-        <!-- ARROW -->
-        <div class="swap-arrow-row">
-          <button class="swap-arrow-btn" onclick="flipSwap()">⇅</button>
-        </div>
-
-        <!-- TO -->
-        <div class="swap-token-box">
-          <div class="swap-box-label">TO (ESTIMATED)</div>
-          <div class="swap-token-row">
-            <input class="swap-amount-input" id="swapAmtOut" placeholder="0.00" readonly>
-            <div class="swap-tok-dropdown">
-              <div class="swap-tok-select" onclick="toggleSwapDd('to')">
-                <div class="swap-tok-icon" id="swapToIcon" style="background:#bf00ff20;color:#bf00ff">M</div>
-                <span id="swapToSym">MON</span>
-                <span style="color:#444;font-size:0.7em">▾</span>
-              </div>
-              <div class="swap-dropdown-menu" id="swapToDd"></div>
-            </div>
-          </div>
-          <div class="swap-usd" id="swapToUsd">≈ $0.00</div>
-        </div>
-
-        <!-- QUOTE DETAILS -->
-        <div class="swap-quote-box" id="swapQuoteBox">
-          <div class="swap-qrow hl"><span>ESTIMATED OUTPUT</span><span id="sqOut">—</span></div>
-          <div class="swap-qrow"><span>EXCHANGE RATE</span><span id="sqRate">—</span></div>
-          <div class="swap-qrow"><span>SLIPPAGE</span><span>0.5%</span></div>
-          <div class="swap-qrow"><span>ROUTE</span><span id="sqRoute">NEAR INTENTS</span></div>
-          <div class="swap-qrow"><span>EST. TIME</span><span>~30s</span></div>
-        </div>
-
-        <button class="swap-quote-btn" id="swapQuoteBtn" onclick="getSwapQuote()">⟳ GET QUOTE</button>
-        <button class="swap-exec-btn" id="swapExecBtn" onclick="execSwap()">💎 EXECUTE SWAP</button>
-        <div class="swap-msg" id="swapMsg"></div>
-
-        <div class="swap-powered">
-          POWERED BY
-          <a href="https://docs.near.org/chain-abstraction/intents/quickstart" target="_blank">NEAR INTENTS 1-CLICK API</a>
-          · NON-CUSTODIAL · CROSS-CHAIN
-        </div>
-      </div>
+    <div class="swap-quote-box" id="swapQuoteBox">
+      <div class="swap-qrow hl"><span>EST. OUTPUT</span><span id="sqOut">—</span></div>
+      <div class="swap-qrow"><span>RATE</span><span id="sqRate">—</span></div>
+      <div class="swap-qrow"><span>SLIPPAGE</span><span>0.5%</span></div>
+      <div class="swap-qrow"><span>ROUTE</span><span id="sqRoute">NEAR INTENTS</span></div>
+      <div class="swap-qrow"><span>EST. TIME</span><span>~30s</span></div>
     </div>
+
+    <button class="btn btn-quote" id="swapQuoteBtn" onclick="getSwapQuote()">⟳ GET QUOTE</button>
+    <button class="btn btn-exec" id="swapExecBtn" onclick="execSwap()">💎 EXECUTE SWAP</button>
+    <div class="swap-msg" id="swapMsg"></div>
+    <div class="swap-powered">POWERED BY <a href="https://docs.near.org/chain-abstraction/intents/quickstart" target="_blank">NEAR INTENTS 1-CLICK API</a> · NON-CUSTODIAL</div>
   </div>
 
-  <!-- DONATE BANNER -->
-  <div class="donate-banner">
-    <div class="donate-inner">
-      <div class="donate-title">💜 SUPPORT JOKER 777 💜</div>
-      <div class="donate-sub">Love the game? Help keep it running — donate MON directly on Monad!</div>
-      <a class="donate-btn" href="https://monadvision.com/myspace?feature=Wallet&type=Portfolio" target="_blank" rel="noopener">
-        <span class="donate-coins">💰</span> DONATE MON <span class="donate-coins">💰</span>
-      </a>
-    </div>
+  <!-- DONATE -->
+  <div class="donate-panel">
+    <div class="donate-title">💜 SUPPORT JOKER 777 💜</div>
+    <div class="donate-sub">LOVE THE GAME? HELP KEEP IT RUNNING — DONATE MON ON MONAD!</div>
+    <a class="donate-btn" href="https://monadvision.com/myspace?feature=Wallet&type=Portfolio" target="_blank" rel="noopener">
+      💰 DONATE MON 💰
+    </a>
   </div>
 
-  <div class="footer" style="margin-top: 28px;">
-    Joker 777 Slot · Powered by Monad · Contract:
-    <a href="https://explorer.monad.xyz/address/0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a" target="_blank">0x2d5c...778a</a>
-    &nbsp;·&nbsp; <a href="privacy-policy.html">Privacy Policy</a>
+  <div class="footer">
+    JOKER 777 SLOT · POWERED BY MONAD ·
+    CONTRACT: <a href="https://explorer.monad.xyz/address/0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a" target="_blank">0x2d5c...778a</a>
+    &nbsp;·&nbsp; <a href="privacy-policy.html">PRIVACY</a>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
-  <script>
-    // ════════════════════════════════════════
-    // ⚙️  NEAR INTENTS CONFIG
-    // ════════════════════════════════════════
-    // TODO: Replace with your real JWT token once API key is Active
-    const NEAR_JWT = 'YOUR_JWT_TOKEN_HERE';
-    const NEAR_API = 'https://1click.chaindefuser.com';
+</div><!-- end .page -->
 
-    // ════════════════════════════════════════
-    // ⚙️  SLOT CONFIG
-    // ════════════════════════════════════════
-    const SLOT_ADDR = "0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a";
-    const MONAD_CHAIN_ID = 143;
-    const MONAD_HEX = "0x8f";
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+<script>
+// ── VIBRATE ALL BUTTONS ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button,a.donate-btn');
+  if (!btn || btn.disabled) return;
+  btn.classList.remove('vib'); void btn.offsetWidth;
+  btn.classList.add('vib');
+  btn.addEventListener('animationend', () => btn.classList.remove('vib'), {once:true});
+});
+document.addEventListener('touchstart', e => {
+  const btn = e.target.closest('button,a.donate-btn');
+  if (!btn || btn.disabled) return;
+  btn.classList.remove('vib'); void btn.offsetWidth;
+  btn.classList.add('vib');
+  btn.addEventListener('animationend', () => btn.classList.remove('vib'), {once:true});
+}, {passive:true});
 
-    const SLOT_ABI = [
-      {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
-      {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},
-      {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},
-      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
-      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rand","type":"uint256"},{"indexed":false,"internalType":"bool","name":"win","type":"bool"},{"indexed":false,"internalType":"bool","name":"jackpot","type":"bool"},{"indexed":false,"internalType":"uint256","name":"payout","type":"uint256"}],"name":"Spin","type":"event"},
-      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"numSpins","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"price","type":"uint256"}],"name":"SpinsPurchased","type":"event"},
-      {"inputs":[{"internalType":"uint256","name":"i","type":"uint256"}],"name":"allowedBets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"allowedBetsLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"bets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[{"internalType":"uint256","name":"numSpins","type":"uint256"}],"name":"buySpins","outputs":[],"stateMutability":"payable"},
-      {"inputs":[{"internalType":"uint256","name":"numSpins","type":"uint256"}],"name":"getSpinPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure"},
-      {"inputs":[],"name":"jackpotChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"jackpotFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"jackpotPool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"nftContract","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view"},
-      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view"},
-      {"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view"},
-      {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"prepaidSpins","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable"},
-      {"inputs":[{"internalType":"address","name":"_nft","type":"address"}],"name":"setNFTContract","outputs":[],"stateMutability":"nonpayable"},
-      {"inputs":[{"internalType":"bool","name":"v","type":"bool"}],"name":"setPaused","outputs":[],"stateMutability":"nonpayable"},
-      {"inputs":[{"internalType":"uint256","name":"betIndex","type":"uint256"}],"name":"spin","outputs":[],"stateMutability":"payable"},
-      {"inputs":[],"name":"spinWithPackage","outputs":[],"stateMutability":"nonpayable"},
-      {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable"},
-      {"inputs":[],"name":"winChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"winMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
-      {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable"},
-      {"stateMutability":"payable","type":"receive"}
-    ];
+// ════════════════════════════════════════
+// ⚙️  CONFIG
+// ════════════════════════════════════════
+const NEAR_JWT = 'YOUR_JWT_TOKEN_HERE';
+const NEAR_API = 'https://1click.chaindefuser.com';
+const SLOT_ADDR = "0x2d5ccE1A57eDebcE6c4824e717DfFD84184d778a";
+const MONAD_CHAIN_ID = 143;
+const MONAD_HEX = "0x8f";
 
-    const SYMBOLS = ["🍒","🍋","🍉","🔔","💎","7️⃣","🃏","⭐","💰","👑"];
-    let provider, signer, slot, address, bets = [], betIdx = 0, spinning = false;
-    let prepaidSpins = 0, userBalance = 0;
-    let stats = { spins: 0, wins: 0, totalBet: 0, totalWon: 0 };
+const SLOT_ABI = [
+  {"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},
+  {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rand","type":"uint256"},{"indexed":false,"internalType":"bool","name":"win","type":"bool"},{"indexed":false,"internalType":"bool","name":"jackpot","type":"bool"},{"indexed":false,"internalType":"uint256","name":"payout","type":"uint256"}],"name":"Spin","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"numSpins","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"price","type":"uint256"}],"name":"SpinsPurchased","type":"event"},
+  {"inputs":[{"internalType":"uint256","name":"i","type":"uint256"}],"name":"allowedBets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"allowedBetsLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"bets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[{"internalType":"uint256","name":"numSpins","type":"uint256"}],"name":"buySpins","outputs":[],"stateMutability":"payable"},
+  {"inputs":[{"internalType":"uint256","name":"numSpins","type":"uint256"}],"name":"getSpinPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure"},
+  {"inputs":[],"name":"jackpotChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"jackpotFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"jackpotPool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"nftContract","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view"},
+  {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view"},
+  {"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view"},
+  {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"prepaidSpins","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable"},
+  {"inputs":[{"internalType":"address","name":"_nft","type":"address"}],"name":"setNFTContract","outputs":[],"stateMutability":"nonpayable"},
+  {"inputs":[{"internalType":"bool","name":"v","type":"bool"}],"name":"setPaused","outputs":[],"stateMutability":"nonpayable"},
+  {"inputs":[{"internalType":"uint256","name":"betIndex","type":"uint256"}],"name":"spin","outputs":[],"stateMutability":"payable"},
+  {"inputs":[],"name":"spinWithPackage","outputs":[],"stateMutability":"nonpayable"},
+  {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable"},
+  {"inputs":[],"name":"winChance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"winMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view"},
+  {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable"},
+  {"stateMutability":"payable","type":"receive"}
+];
 
-    const btnConnect = document.getElementById("btnConnect");
-    const connLabel = document.getElementById("connLabel");
-    const walletAddr = document.getElementById("walletAddr");
-    const walletBal = document.getElementById("walletBal");
-    const jackpotVal = document.getElementById("jackpotVal");
-    const betRow = document.getElementById("betRow");
-    const btnSpin = document.getElementById("btnSpin");
-    const spinBtnText = document.getElementById("spinBtnText");
-    const statusEl = document.getElementById("status");
-    const txRow = document.getElementById("txRow");
-    const spinsLeft = document.getElementById("spinsLeft");
-    const networkBar = document.getElementById("networkBar");
-    const switchNetworkBtn = document.getElementById("switchNetworkBtn");
-    const nftBadge = document.getElementById("nftBadge");
-    const flashOverlay = document.getElementById("flashOverlay");
-    const rainContainer = document.getElementById("rainContainer");
-    const logList = document.getElementById("logList");
+const SYMBOLS = ["🍒","🍋","🍉","🔔","💎","7️⃣","🃏","⭐","💰","👑"];
+let provider, signer, slot, address, bets=[], betIdx=0, spinning=false;
+let prepaidSpins=0, userBalance=0;
+let stats={spins:0,wins:0,totalBet:0,totalWon:0};
 
-    // --- AUDIO ---
-    let audioCtx;
-    function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
-    function playTone(freq, type, dur, vol=0.2, delay=0) {
-      try {
-        const ctx = getAudioCtx(), o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination); o.type = type;
-        o.frequency.setValueAtTime(freq, ctx.currentTime+delay);
-        g.gain.setValueAtTime(vol, ctx.currentTime+delay);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+dur);
-        o.start(ctx.currentTime+delay); o.stop(ctx.currentTime+delay+dur+0.01);
-      } catch {}
-    }
-    function playNoise(dur, vol=0.12) {
-      try {
-        const ctx = getAudioCtx(), buf = ctx.createBuffer(1, ctx.sampleRate*dur, ctx.sampleRate);
-        const data = buf.getChannelData(0);
-        for (let i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
-        const src = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
-        f.type='bandpass'; f.frequency.value=800; f.Q.value=0.5;
-        src.buffer=buf; src.connect(f); f.connect(g); g.connect(ctx.destination);
-        g.gain.setValueAtTime(vol, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
-        src.start(); src.stop(ctx.currentTime+dur+0.05);
-      } catch {}
-    }
-    function soundSpin() { for(let i=0;i<3;i++){playTone(180+i*60,'sawtooth',0.13,0.09,i*0.07);playTone(180+i*60*1.5,'sawtooth',0.10,0.07,i*0.07+0.04);}playNoise(0.3,0.13); }
-    function soundWin() { [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.18,0.25,i*0.12)); }
-    function soundJackpot() { [523,659,784,1047,1319,1568].forEach((f,i)=>{playTone(f,'sine',0.25,0.3,i*0.1);playTone(f*1.5,'triangle',0.18,0.15,i*0.1+0.05);}); }
-    function soundLose() { playTone(220,'sawtooth',0.18,0.15); playTone(180,'sawtooth',0.18,0.15,0.1); playTone(150,'sawtooth',0.2,0.12,0.22); }
+const btnConnect=document.getElementById("btnConnect");
+const walletAddr=document.getElementById("walletAddr");
+const walletBal=document.getElementById("walletBal");
+const jackpotVal=document.getElementById("jackpotVal");
+const betRow=document.getElementById("betRow");
+const btnSpin=document.getElementById("btnSpin");
+const spinBtnText=document.getElementById("spinBtnText");
+const statusEl=document.getElementById("status");
+const txRow=document.getElementById("txRow");
+const spinsLeft=document.getElementById("spinsLeft");
+const networkBar=document.getElementById("networkBar");
+const switchNetworkBtn=document.getElementById("switchNetworkBtn");
+const nftBadge=document.getElementById("nftBadge");
+const flashOverlay=document.getElementById("flashOverlay");
+const rainContainer=document.getElementById("rainContainer");
+const logList=document.getElementById("logList");
 
-    // --- NETWORK CHECK ---
-    async function checkNetwork() {
-      if (!window.ethereum) return false;
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      const isMonad = parseInt(chainId, 16) === MONAD_CHAIN_ID;
-      if (!isMonad) { networkBar.classList.add("show"); btnSpin.disabled = true; return false; }
-      networkBar.classList.remove("show"); btnSpin.disabled = false; return true;
-    }
-    if (window.ethereum) {
-      window.ethereum.on('chainChanged', async () => {
-        const ok = await checkNetwork();
-        if (ok && slot) { loadBalance(); loadBets(); loadJackpot(); }
-      });
-    }
+// AUDIO
+let audioCtx;
+function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playTone(freq,type,dur,vol=0.2,delay=0){try{const ctx=getAudioCtx(),o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);g.gain.setValueAtTime(vol,ctx.currentTime+delay);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+0.01);}catch{}}
+function playNoise(dur,vol=0.12){try{const ctx=getAudioCtx(),buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1);const src=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=0.5;src.buffer=buf;src.connect(f);f.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(vol,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);src.start();src.stop(ctx.currentTime+dur+0.05);}catch{}}
+function soundSpin(){for(let i=0;i<3;i++){playTone(180+i*60,'sawtooth',0.13,0.09,i*0.07);playTone(180+i*60*1.5,'sawtooth',0.10,0.07,i*0.07+0.04);}playNoise(0.3,0.13);}
+function soundWin(){[523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.18,0.25,i*0.12));}
+function soundJackpot(){[523,659,784,1047,1319,1568].forEach((f,i)=>{playTone(f,'sine',0.25,0.3,i*0.1);playTone(f*1.5,'triangle',0.18,0.15,i*0.1+0.05);});}
+function soundLose(){playTone(220,'sawtooth',0.18,0.15);playTone(180,'sawtooth',0.18,0.15,0.1);playTone(150,'sawtooth',0.2,0.12,0.22);}
 
-    switchNetworkBtn.onclick = async function() {
-      if (!window.ethereum) { showToast("No Wallet", "Please install MetaMask or Rabby"); return; }
-      const MONAD_PARAMS = {
-        chainId: MONAD_HEX, chainName: 'Monad Mainnet',
-        nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
-        rpcUrls: ['https://rpc.monad.xyz'], blockExplorerUrls: ['https://explorer.monad.xyz']
-      };
-      try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_HEX }] }); return; } catch (e) {}
-      try { await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [MONAD_PARAMS] }); await checkNetwork(); }
-      catch (addErr) { showToast("⚠️ Cancelled", "Please approve the network switch in your wallet."); }
-    };
+// NETWORK
+async function checkNetwork(){
+  if(!window.ethereum)return false;
+  const chainId=await window.ethereum.request({method:'eth_chainId'});
+  const isMonad=parseInt(chainId,16)===MONAD_CHAIN_ID;
+  if(!isMonad){networkBar.classList.add("show");btnSpin.disabled=true;return false;}
+  networkBar.classList.remove("show");if(signer)btnSpin.disabled=false;return true;
+}
+if(window.ethereum){window.ethereum.on('chainChanged',async()=>{const ok=await checkNetwork();if(ok&&slot){loadBalance();loadBets();loadJackpot();}});}
 
-    // --- WALLET CONNECT ---
-    btnConnect.onclick = async function() {
-      if (!window.ethereum) { showResult("Install MetaMask or Rabby", "lose"); return; }
-      try {
-        provider = new ethers.BrowserProvider(window.ethereum, "any");
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        signer = await provider.getSigner();
-        address = await signer.getAddress();
-        slot = new ethers.Contract(SLOT_ADDR, SLOT_ABI, signer);
-        connLabel.textContent = "Connected"; btnConnect.classList.add("connected");
-        walletAddr.textContent = shortAddr(address);
-        const ok = await checkNetwork();
-        if (ok) { loadBalance(); loadBets(); loadJackpot(); showResult("✅ Wallet connected! Ready to spin.", "win"); }
-        showToast("Wallet Connected", shortAddr(address));
-        listenSpinEvents();
-      } catch(e) { showResult("Connection failed: " + (e.message || e), "lose"); }
-    };
+switchNetworkBtn.onclick=async function(){
+  if(!window.ethereum){showToast("No Wallet","Install MetaMask or Rabby");return;}
+  const P={chainId:MONAD_HEX,chainName:'Monad Mainnet',nativeCurrency:{name:'MON',symbol:'MON',decimals:18},rpcUrls:['https://rpc.monad.xyz'],blockExplorerUrls:['https://explorer.monad.xyz']};
+  try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:MONAD_HEX}]});return;}catch(e){}
+  try{await window.ethereum.request({method:'wallet_addEthereumChain',params:[P]});await checkNetwork();}
+  catch(addErr){showToast("⚠️ Cancelled","Approve network switch in wallet.");}
+};
 
-    function shortAddr(a) { return a ? a.slice(0,6)+"..."+a.slice(-4) : ""; }
+// WALLET
+btnConnect.onclick=async function(){
+  if(!window.ethereum){showResult("Install MetaMask or Rabby","lose");return;}
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum,"any");
+    await window.ethereum.request({method:"eth_requestAccounts"});
+    signer=await provider.getSigner();
+    address=await signer.getAddress();
+    slot=new ethers.Contract(SLOT_ADDR,SLOT_ABI,signer);
+    btnConnect.textContent="✅ "+shortAddr(address);
+    btnConnect.classList.add("connected");
+    walletAddr.textContent=shortAddr(address);
+    const ok=await checkNetwork();
+    if(ok){loadBalance();loadBets();loadJackpot();showResult("✅ Wallet connected! Ready to spin.","win");}
+    showToast("Wallet Connected",shortAddr(address));
+    listenSpinEvents();
+    window.ethereum.on('accountsChanged',()=>location.reload());
+  }catch(e){showResult("Connection failed: "+(e.message||e),"lose");}
+};
 
-    async function loadBalance() {
-      if (!provider || !address) return;
-      const bal = await provider.getBalance(address);
-      userBalance = Number(ethers.formatEther(bal));
-      walletBal.textContent = userBalance.toFixed(4) + " MON";
-    }
+function shortAddr(a){return a?a.slice(0,6)+"..."+a.slice(-4):"";}
 
-    async function loadBets() {
-      if (!slot) return;
-      const len = await slot.allowedBetsLength(); bets = [];
-      for (let i = 0; i < Number(len); i++) {
-        const v = await slot.allowedBets(i);
-        bets.push({ idx: i, value: v, label: Number(ethers.formatEther(v)).toFixed(4) + " MON" });
+async function loadBalance(){
+  if(!provider||!address)return;
+  const bal=await provider.getBalance(address);
+  userBalance=Number(ethers.formatEther(bal));
+  walletBal.textContent=userBalance.toFixed(4)+" MON";
+}
+async function loadBets(){
+  if(!slot)return;
+  const len=await slot.allowedBetsLength();bets=[];
+  for(let i=0;i<Number(len);i++){const v=await slot.allowedBets(i);bets.push({idx:i,value:v,label:Number(ethers.formatEther(v)).toFixed(4)+" MON"});}
+  betIdx=0;renderBets();
+}
+function renderBets(){
+  betRow.innerHTML="";
+  bets.forEach((b,i)=>{
+    const btn=document.createElement("button");
+    btn.className="bet-btn"+(i===betIdx?" active":"");
+    btn.textContent=b.label;
+    btn.onclick=()=>{betIdx=i;renderBets();};
+    betRow.appendChild(btn);
+  });
+}
+async function loadJackpot(){
+  if(!slot)return;
+  try{const jp=await slot.jackpotPool();jackpotVal.textContent=Number(ethers.formatEther(jp)).toFixed(4);}catch{}
+}
+setInterval(loadJackpot,8000);
+
+function listenSpinEvents(){
+  if(!slot)return;
+  slot.on("Spin",(player,betAmount,rand,win,jackpot,payout)=>{
+    if(player.toLowerCase()===address.toLowerCase())return;
+    const short=shortAddr(player),amt=Number(ethers.formatEther(payout)).toFixed(2);
+    if(jackpot){addLog(`🎉 ${short} HIT JACKPOT! +${amt} MON`,"","jackpot");showToast("🎉 JACKPOT!",`${short} won ${amt} MON`);}
+    else if(win){addLog(`⭐ ${short} won +${amt} MON`,"","win");}
+  });
+}
+
+function updateSpinsLeft(){spinsLeft.textContent="SPINS REMAINING: "+prepaidSpins;}
+
+async function buyPackage(spins,moons){
+  if(!slot||!signer){showResult("Connect wallet first!","lose");return;}
+  if(spinning)return;
+  if(userBalance<moons){showResult("Not enough MON for this package!","lose");return;}
+  try{
+    showResult(`Buying ${spins} spins for ${moons} MON...`,"");btnSpin.disabled=true;
+    const tx=await slot.buySpins(spins,{value:ethers.parseEther(moons.toString())});
+    txRow.innerHTML=`<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
+    await tx.wait();
+    prepaidSpins=Number(await slot.prepaidSpins(address));updateSpinsLeft();
+    showResult(`✅ Package purchased! ${prepaidSpins} spins ready.`,"win");
+    showToast("Package Bought",`${prepaidSpins} spins loaded!`);
+    btnSpin.disabled=false;loadBalance();
+  }catch(e){showResult(e.reason||e.shortMessage||e.message||"TX failed","lose");btnSpin.disabled=false;}
+}
+window.buyPackage=buyPackage;
+updateSpinsLeft();
+
+// SPIN
+btnSpin.onclick=async function(){
+  if(!slot||spinning)return;
+  if(!(await checkNetwork()))return;
+  prepaidSpins=Number(await slot.prepaidSpins(address));
+  spinning=true;btnSpin.disabled=true;btnSpin.classList.add("loading");
+  spinBtnText.innerHTML='<span class="spin-spinner"></span> SPINNING...';
+  txRow.innerHTML="";nftBadge.classList.remove("show");
+  const currentBet=bets[betIdx]?Number(ethers.formatEther(bets[betIdx].value)):0;
+  try{
+    let tx;
+    if(prepaidSpins>0){showResult("Spinning (prepaid)...","");soundSpin();tx=await slot.spinWithPackage();}
+    else{showResult("Spinning...","");soundSpin();const bet=bets[betIdx];tx=await slot.spin(bet.idx,{value:bet.value});}
+    txRow.innerHTML=`<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
+    showResult("Waiting for result...","");
+    const receipt=await tx.wait();
+    const spinEvent=receipt.logs.map(log=>{try{return slot.interface.parseLog(log);}catch{return null;}}).find(e=>e&&e.name==="Spin");
+    if(spinEvent){
+      const{win,jackpot,rand,payout}=spinEvent.args;
+      const r=Number(rand),payoutMON=Number(ethers.formatEther(payout)).toFixed(2);
+      stats.spins++;
+      if(prepaidSpins<=0)stats.totalBet+=currentBet;
+      if(jackpot){
+        const sym=r%SYMBOLS.length;
+        await animateReels(sym,sym,sym);highlightReels([0,1,2],"#ffcc00");
+        showResult("🎉 JACKPOT! You won the pool!","jackpot");
+        soundJackpot();flashScreen("jackpot-flash");startRain(30);
+        showNFTBadge("🏆 JACKPOT WINNER!","NFT Badge minted to your wallet");
+        stats.wins++;stats.totalWon+=Number(ethers.formatEther(payout));
+        addLog(`🎉 JACKPOT! +${payoutMON} MON`,"","jackpot");
+        showToast("🎉 JACKPOT!",`You won ${payoutMON} MON!`);
+      }else if(win){
+        const sym=r%SYMBOLS.length;
+        await animateReels(sym,sym,sym);highlightReels([0,1,2],"#ff00ff");
+        showResult(`⭐ You win! +${payoutMON} MON`,"win");
+        soundWin();flashScreen("win-flash");startRain(12);
+        stats.wins++;stats.totalWon+=Number(ethers.formatEther(payout));
+        addLog(`⭐ WIN +${payoutMON} MON`,"","win");
+        showToast("⭐ Winner!",`+${payoutMON} MON sent!`);
+      }else{
+        let s1=r%SYMBOLS.length,s2=(s1+1+Math.floor(Math.random()*4))%SYMBOLS.length,s3=(s1+3+Math.floor(Math.random()*4))%SYMBOLS.length;
+        if(s2===s1)s2=(s2+1)%SYMBOLS.length;if(s3===s1||s3===s2)s3=(s3+2)%SYMBOLS.length;
+        await animateReels(s1,s2,s3);clearHighlight();
+        showResult("No win. Try again!","lose");soundLose();addLog("❌ No win","","lose");
       }
-      betIdx = 0; renderBets();
-    }
+      updateStats();
+    }else{await animateReels();showResult("Spin complete!","");}
+    setTimeout(clearHighlight,1500);
+    prepaidSpins=Number(await slot.prepaidSpins(address));
+    updateSpinsLeft();loadBalance();loadJackpot();
+  }catch(e){showResult(e.reason||e.shortMessage||e.message||"TX failed","lose");soundLose();}
+  spinning=false;btnSpin.disabled=false;
+  btnSpin.classList.remove("loading");spinBtnText.textContent="🎰 SPIN 🎰";
+};
 
-    function renderBets() {
-      betRow.innerHTML = "Bet: ";
-      bets.forEach((b, i) => {
-        const btn = document.createElement("button");
-        btn.className = "bet-btn" + (i === betIdx ? " active" : "");
-        btn.textContent = b.label;
-        btn.onclick = () => { betIdx = i; renderBets(); };
-        betRow.appendChild(btn);
-      });
-    }
+// REELS
+function randSym(){return Math.floor(Math.random()*SYMBOLS.length);}
+function setReel(i,sym){document.getElementById("reel"+i).textContent=SYMBOLS[sym%SYMBOLS.length];}
+async function animReel(idx,finalSym,dur){
+  const el=document.getElementById("reel"+idx),end=Date.now()+dur;
+  while(Date.now()<end){el.textContent=SYMBOLS[randSym()];await new Promise(r=>setTimeout(r,65));}
+  el.textContent=SYMBOLS[finalSym%SYMBOLS.length];
+}
+async function animateReels(s0,s1,s2){
+  const r0=s0!==undefined?s0:randSym(),r1=s1!==undefined?s1:randSym(),r2=s2!==undefined?s2:randSym();
+  await Promise.all([animReel(0,r0,600),animReel(1,r1,850),animReel(2,r2,1100)]);
+}
+function highlightReels(indices,color){
+  for(let i=0;i<3;i++){
+    document.getElementById("reel"+i).style.boxShadow=indices.includes(i)
+      ?`0 0 48px 12px ${color}, 0 0 0 3px ${color} inset`
+      :"0 0 20px rgba(255,204,0,0.3),inset 0 0 20px rgba(0,0,0,0.8)";
+    document.getElementById("reel"+i).style.borderColor=indices.includes(i)?color:"var(--n3)";
+  }
+}
+function clearHighlight(){for(let i=0;i<3;i++){document.getElementById("reel"+i).style.boxShadow="0 0 20px rgba(255,204,0,0.3),inset 0 0 20px rgba(0,0,0,0.8)";document.getElementById("reel"+i).style.borderColor="var(--n3)";}}
+function showResult(msg,cls){statusEl.textContent=msg;statusEl.className="status-bar"+(cls?" "+cls:"");}
+function flashScreen(cls){flashOverlay.className="flash-overlay "+cls+" active";setTimeout(()=>{flashOverlay.className="flash-overlay "+cls;},500);}
+function startRain(count){
+  rainContainer.innerHTML="";
+  for(let i=0;i<count;i++){
+    const el=document.createElement("div");el.className="rain-sym";
+    el.textContent=SYMBOLS[randSym()];
+    el.style.left=Math.random()*100+"vw";el.style.animationDuration=(1.2+Math.random()*2)+"s";
+    el.style.animationDelay=(Math.random()*0.8)+"s";el.style.fontSize=(1.5+Math.random()*2)+"em";
+    rainContainer.appendChild(el);el.addEventListener("animationend",()=>el.remove());
+  }
+}
+function showNFTBadge(title,sub){
+  document.getElementById("nftTitle").textContent=title;
+  document.getElementById("nftSub").textContent=sub;
+  nftBadge.classList.add("show");setTimeout(()=>nftBadge.classList.remove("show"),6000);
+}
+function updateStats(){
+  document.getElementById("statSpins").textContent=stats.spins;
+  document.getElementById("statWins").textContent=stats.wins;
+  document.getElementById("statWon").textContent=stats.totalWon.toFixed(2);
+  document.getElementById("statBet").textContent=stats.totalBet.toFixed(2);
+  document.getElementById("statWonFull").textContent=stats.totalWon.toFixed(2);
+  const wr=stats.spins>0?((stats.wins/stats.spins)*100).toFixed(1)+"%":"0%";
+  document.getElementById("statWR").textContent=wr;
+  const profit=(stats.totalWon-stats.totalBet).toFixed(2);
+  const profEl=document.getElementById("statProfit");
+  profEl.textContent=profit;
+  profEl.style.color=parseFloat(profit)>=0?"var(--n6)":"var(--lose)";
+}
+function addLog(result,amount,cls){
+  const empty=logList.querySelector(".log-entry.lose span");
+  if(empty&&empty.textContent.includes("No spins yet"))logList.innerHTML="";
+  const entry=document.createElement("div");entry.className="log-entry "+cls;
+  entry.innerHTML=`<span>${result}</span><span style="color:#444;font-size:9px">${new Date().toLocaleTimeString()}</span>`;
+  logList.prepend(entry);
+  while(logList.children.length>20)logList.lastChild.remove();
+}
+let toastTimer;
+function showToast(title,body){
+  document.getElementById("toastTitle").textContent=title;
+  document.getElementById("toastBody").textContent=body;
+  const t=document.getElementById("toast");t.classList.add("show");clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),3500);
+}
 
-    async function loadJackpot() {
-      if (!slot) return;
-      try { const jp = await slot.jackpotPool(); jackpotVal.textContent = Number(ethers.formatEther(jp)).toFixed(4); } catch {}
-    }
-    setInterval(loadJackpot, 8000);
+// Init reels
+[0,1,2].forEach(i=>setReel(i,randSym()));
 
-    function listenSpinEvents() {
-      if (!slot) return;
-      slot.on("Spin", (player, betAmount, rand, win, jackpot, payout) => {
-        if (player.toLowerCase() === address.toLowerCase()) return;
-        const short = shortAddr(player), amt = Number(ethers.formatEther(payout)).toFixed(2);
-        if (jackpot) { addLog(`🎉 ${short} HIT JACKPOT! +${amt} MON`, "", "jackpot"); showToast("🎉 JACKPOT!", `${short} won ${amt} MON`); }
-        else if (win) { addLog(`⭐ ${short} won +${amt} MON`, "", "win"); }
-      });
-    }
+// ════════════════════════════════════════
+// ⇄  NEAR INTENTS SWAP
+// ════════════════════════════════════════
+const SWAP_TOKENS=[
+  {sym:'ETH',name:'Ethereum',icon:'Ξ',color:'#627EEA',asset:'nep141:eth.omft.near',price:3400,decimals:18},
+  {sym:'BTC',name:'Bitcoin',icon:'₿',color:'#F7931A',asset:'nep141:btc.omft.near',price:65000,decimals:8},
+  {sym:'USDC',name:'USD Coin',icon:'$',color:'#2775CA',asset:'nep141:usdc.omft.near',price:1,decimals:6},
+  {sym:'USDT',name:'Tether',icon:'₮',color:'#26A17B',asset:'nep141:usdt.omft.near',price:1,decimals:6},
+  {sym:'SOL',name:'Solana',icon:'◎',color:'#9945FF',asset:'nep141:sol.omft.near',price:170,decimals:9},
+  {sym:'NEAR',name:'NEAR',icon:'Ⓝ',color:'#00C1DE',asset:'nep141:wrap.near',price:8,decimals:24},
+  {sym:'MON',name:'Monad',icon:'M',color:'#ff00ff',asset:'nep141:mon.omft.near',price:12,decimals:18},
+  {sym:'BNB',name:'BNB',icon:'◆',color:'#F3BA2F',asset:'nep141:bnb.omft.near',price:580,decimals:18},
+];
+let swapFrom=SWAP_TOKENS[0],swapTo=SWAP_TOKENS[6],swapQuoteData=null;
 
-    function updateSpinsLeft() { spinsLeft.textContent = "Spins left: " + prepaidSpins; }
-
-    async function buyPackage(spins, moons) {
-      if (!slot || !signer) { showResult("Connect wallet first!", "lose"); return; }
-      if (spinning) return;
-      if (userBalance < moons) { showResult("Not enough MON for this package!", "lose"); return; }
-      try {
-        showResult(`Buying ${spins} spins for ${moons} MON...`, ""); btnSpin.disabled = true;
-        const tx = await slot.buySpins(spins, { value: ethers.parseEther(moons.toString()) });
-        txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
-        await tx.wait();
-        prepaidSpins = Number(await slot.prepaidSpins(address)); updateSpinsLeft();
-        showResult(`✅ Package purchased! ${prepaidSpins} spins ready.`, "win");
-        showToast("Package Bought", `${prepaidSpins} spins loaded!`);
-        btnSpin.disabled = false; loadBalance();
-      } catch (e) {
-        showResult(e.reason || e.shortMessage || e.message || "TX failed", "lose");
-        btnSpin.disabled = false;
-      }
-    }
-    window.buyPackage = buyPackage;
-    updateSpinsLeft();
-
-    // --- SPIN ---
-    btnSpin.onclick = async function() {
-      if (!slot || spinning) return;
-      if (!(await checkNetwork())) return;
-      prepaidSpins = Number(await slot.prepaidSpins(address));
-      spinning = true; btnSpin.disabled = true; btnSpin.classList.add("loading");
-      spinBtnText.innerHTML = '<span class="spinner"></span> SPIN';
-      txRow.innerHTML = ""; nftBadge.classList.remove("show");
-      const currentBet = bets[betIdx] ? Number(ethers.formatEther(bets[betIdx].value)) : 0;
-      try {
-        let tx;
-        if (prepaidSpins > 0) { showResult("Spinning (prepaid)...", ""); soundSpin(); tx = await slot.spinWithPackage(); }
-        else { showResult("Spinning...", ""); soundSpin(); const bet = bets[betIdx]; tx = await slot.spin(bet.idx, { value: bet.value }); }
-        txRow.innerHTML = `<a class="txlink" href="https://explorer.monad.xyz/tx/${tx.hash}" target="_blank">TX: ${tx.hash.slice(0,10)}...</a>`;
-        showResult("Waiting for result...", "");
-        const receipt = await tx.wait();
-        const spinEvent = receipt.logs.map(log => { try { return slot.interface.parseLog(log); } catch { return null; } }).find(e => e && e.name === "Spin");
-        if (spinEvent) {
-          const { win, jackpot, rand, payout } = spinEvent.args;
-          const r = Number(rand), payoutMON = Number(ethers.formatEther(payout)).toFixed(2);
-          stats.spins++;
-          if (prepaidSpins <= 0) stats.totalBet += currentBet;
-          if (jackpot) {
-            const sym = r % SYMBOLS.length;
-            await animateReels(sym, sym, sym); highlightReels([0,1,2], "#00ffff");
-            showResult("🎉 JACKPOT! You won the pool!", "jackpot");
-            soundJackpot(); flashScreen("jackpot-flash"); startRain(30);
-            showNFTBadge("🏆 JACKPOT WINNER!", "NFT Badge minted to your wallet");
-            stats.wins++; stats.totalWon += Number(ethers.formatEther(payout));
-            addLog(`🎉 JACKPOT! +${payoutMON} MON`, "", "jackpot");
-            showToast("🎉 JACKPOT!", `You won ${payoutMON} MON!`);
-          } else if (win) {
-            const sym = r % SYMBOLS.length;
-            await animateReels(sym, sym, sym); highlightReels([0,1,2], "#bf00ff");
-            showResult(`⭐ You win! +${payoutMON} MON`, "win");
-            soundWin(); flashScreen("win-flash"); startRain(12);
-            stats.wins++; stats.totalWon += Number(ethers.formatEther(payout));
-            addLog(`⭐ WIN +${payoutMON} MON`, "", "win");
-            showToast("⭐ Winner!", `+${payoutMON} MON sent!`);
-          } else {
-            let s1=r%SYMBOLS.length, s2=(s1+1+Math.floor(Math.random()*4))%SYMBOLS.length, s3=(s1+3+Math.floor(Math.random()*4))%SYMBOLS.length;
-            if(s2===s1)s2=(s2+1)%SYMBOLS.length; if(s3===s1||s3===s2)s3=(s3+2)%SYMBOLS.length;
-            await animateReels(s1,s2,s3); clearHighlight();
-            showResult("No win. Try again!", "lose"); soundLose(); addLog("❌ No win", "", "lose");
-          }
-          updateStats();
-        } else { await animateReels(); showResult("Spin complete!", ""); }
-        setTimeout(clearHighlight, 1500);
-        prepaidSpins = Number(await slot.prepaidSpins(address));
-        updateSpinsLeft(); loadBalance(); loadJackpot();
-      } catch (e) { showResult(e.reason || e.shortMessage || e.message || "TX failed", "lose"); soundLose(); }
-      spinning = false; btnSpin.disabled = false;
-      btnSpin.classList.remove("loading"); spinBtnText.textContent = "SPIN";
-    };
-
-    // --- REELS ---
-    function randSym() { return Math.floor(Math.random() * SYMBOLS.length); }
-    function setReel(i, sym) { document.getElementById("reel"+i).textContent = SYMBOLS[sym % SYMBOLS.length]; }
-    function setReels(arr) { for (let i=0;i<3;i++) setReel(i, arr[i]); }
-    async function animReel(idx, finalSym, dur) {
-      const el = document.getElementById("reel"+idx), end = Date.now() + dur;
-      while (Date.now() < end) { el.textContent = SYMBOLS[randSym()]; await new Promise(r => setTimeout(r, 65)); }
-      el.textContent = SYMBOLS[finalSym % SYMBOLS.length];
-    }
-    async function animateReels(s0, s1, s2) {
-      const r0=s0!==undefined?s0:randSym(), r1=s1!==undefined?s1:randSym(), r2=s2!==undefined?s2:randSym();
-      await Promise.all([animReel(0,r0,600), animReel(1,r1,850), animReel(2,r2,1100)]);
-    }
-    function highlightReels(indices, color) {
-      for (let i=0;i<3;i++) {
-        document.getElementById("reel"+i).style.boxShadow = indices.includes(i)
-          ? `0 0 64px 16px ${color}, 0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset`
-          : "0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset";
-      }
-    }
-    function clearHighlight() { for(let i=0;i<3;i++) document.getElementById("reel"+i).style.boxShadow="0 12px 48px #bf00ff30, 0 0 0 8px var(--gold) inset"; }
-    function showResult(msg, cls) { statusEl.textContent = msg; statusEl.className = "status"+(cls?" "+cls:""); }
-    function flashScreen(cls) {
-      flashOverlay.className = "flash-overlay "+cls+" active";
-      setTimeout(() => { flashOverlay.className = "flash-overlay "+cls; }, 500);
-    }
-    function startRain(count) {
-      rainContainer.innerHTML = "";
-      for (let i=0;i<count;i++) {
-        const el = document.createElement("div"); el.className = "rain-sym";
-        el.textContent = SYMBOLS[randSym()];
-        el.style.left = Math.random()*100+"vw"; el.style.animationDuration = (1.2+Math.random()*2)+"s";
-        el.style.animationDelay = (Math.random()*0.8)+"s"; el.style.fontSize = (1.5+Math.random()*2)+"em";
-        rainContainer.appendChild(el); el.addEventListener("animationend", () => el.remove());
-      }
-    }
-    function showNFTBadge(title, sub) {
-      document.getElementById("nftTitle").textContent = title;
-      document.getElementById("nftSub").textContent = sub;
-      nftBadge.classList.add("show"); setTimeout(() => nftBadge.classList.remove("show"), 6000);
-    }
-    function updateStats() {
-      document.getElementById("statSpins").textContent = stats.spins;
-      document.getElementById("statWins").textContent = stats.wins;
-      document.getElementById("statBet").textContent = stats.totalBet.toFixed(2)+" MON";
-      document.getElementById("statWon").textContent = stats.totalWon.toFixed(2)+" MON";
-    }
-    function addLog(result, amount, cls) {
-      const empty = logList.querySelector(".log-entry.lose span");
-      if (empty && empty.textContent === "No spins yet") logList.innerHTML = "";
-      const entry = document.createElement("div"); entry.className = "log-entry "+cls;
-      entry.innerHTML = `<span>${result}</span><span style="color:#888;font-size:0.85em">${new Date().toLocaleTimeString()}</span>`;
-      logList.prepend(entry);
-      while (logList.children.length > 20) logList.lastChild.remove();
-    }
-    let toastTimer;
-    function showToast(title, body) {
-      const toast = document.getElementById("toast");
-      document.getElementById("toastTitle").textContent = title;
-      document.getElementById("toastBody").textContent = body;
-      toast.classList.add("show"); clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
-    }
-    setReels([randSym(), randSym(), randSym()]);
-
-    // ════════════════════════════════════════
-    // ⇄  NEAR INTENTS SWAP LOGIC
-    // ════════════════════════════════════════
-    const SWAP_TOKENS = [
-      {sym:'ETH', name:'Ethereum', icon:'Ξ', color:'#627EEA', asset:'nep141:eth.omft.near',  price:3400, decimals:18},
-      {sym:'BTC', name:'Bitcoin',  icon:'₿', color:'#F7931A', asset:'nep141:btc.omft.near',  price:65000,decimals:8},
-      {sym:'USDC',name:'USD Coin', icon:'$', color:'#2775CA', asset:'nep141:usdc.omft.near', price:1,    decimals:6},
-      {sym:'USDT',name:'Tether',   icon:'₮', color:'#26A17B', asset:'nep141:usdt.omft.near', price:1,    decimals:6},
-      {sym:'SOL', name:'Solana',   icon:'◎', color:'#9945FF', asset:'nep141:sol.omft.near',  price:170,  decimals:9},
-      {sym:'NEAR',name:'NEAR',     icon:'Ⓝ', color:'#00C1DE', asset:'nep141:wrap.near',      price:8,    decimals:24},
-      {sym:'MON', name:'Monad',    icon:'M', color:'#bf00ff', asset:'nep141:mon.omft.near',  price:12,   decimals:18},
-      {sym:'BNB', name:'BNB',      icon:'◆', color:'#F3BA2F', asset:'nep141:bnb.omft.near',  price:580,  decimals:18},
-    ];
-
-    let swapFrom = SWAP_TOKENS[0]; // ETH
-    let swapTo   = SWAP_TOKENS[6]; // MON
-    let swapQuoteData = null;
-
-    function buildSwapDds() {
-      ['from','to'].forEach(side => {
-        const el = document.getElementById('swap'+(side==='from'?'From':'To')+'Dd');
-        el.innerHTML = '';
-        SWAP_TOKENS.forEach(t => {
-          const item = document.createElement('div');
-          item.className = 'swap-dd-item';
-          item.innerHTML = `
-            <div style="width:24px;height:24px;border-radius:50%;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;font-size:0.85em;flex-shrink:0">${t.icon}</div>
-            <div><div class="swap-dd-sym">${t.sym}</div><div class="swap-dd-name">${t.name}</div></div>`;
-          item.onclick = () => selectSwapTok(side, t);
-          el.appendChild(item);
-        });
-      });
-    }
-    buildSwapDds();
-
-    function toggleSwapDd(side) {
-      const id = 'swap'+(side==='from'?'From':'To')+'Dd';
-      document.getElementById(id).classList.toggle('open');
-      const otherId = 'swap'+(side==='from'?'To':'From')+'Dd';
-      document.getElementById(otherId).classList.remove('open');
-    }
-    document.addEventListener('click', e => {
-      if (!e.target.closest('.swap-tok-dropdown'))
-        document.querySelectorAll('.swap-dropdown-menu').forEach(d => d.classList.remove('open'));
+function buildSwapDds(){
+  ['from','to'].forEach(side=>{
+    const el=document.getElementById('swap'+(side==='from'?'From':'To')+'Dd');
+    el.innerHTML='';
+    SWAP_TOKENS.forEach(t=>{
+      const item=document.createElement('div');item.className='swap-dd-item';
+      item.innerHTML=`<div style="width:22px;height:22px;border-radius:50%;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">${t.icon}</div><div><div style="color:#fff;font-family:'Russo One',sans-serif;font-size:11px;letter-spacing:1px">${t.sym}</div><div class="swap-dd-name">${t.name}</div></div>`;
+      item.onclick=()=>selectSwapTok(side,t);
+      el.appendChild(item);
     });
+  });
+}
+buildSwapDds();
 
-    function selectSwapTok(side, token) {
-      if (side==='from') swapFrom=token; else swapTo=token;
-      const pfx = side==='from' ? 'swapFrom' : 'swapTo';
-      document.getElementById(pfx+'Icon').textContent = token.icon;
-      document.getElementById(pfx+'Icon').style.color = token.color;
-      document.getElementById(pfx+'Icon').style.background = token.color+'20';
-      document.getElementById(pfx+'Sym').textContent = token.sym;
-      document.getElementById('swap'+(side==='from'?'From':'To')+'Dd').classList.remove('open');
-      resetSwap();
-    }
+function toggleSwapDd(side){
+  const id='swap'+(side==='from'?'From':'To')+'Dd';
+  document.getElementById(id).classList.toggle('open');
+  document.getElementById('swap'+(side==='from'?'To':'From')+'Dd').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.swap-tok-dropdown'))
+    document.querySelectorAll('.swap-dropdown-menu').forEach(d=>d.classList.remove('open'));
+});
 
-    function flipSwap() {
-      const tmp = swapFrom; swapFrom = swapTo; swapTo = tmp;
-      ['from','to'].forEach(side => {
-        const t = side==='from' ? swapFrom : swapTo;
-        const pfx = side==='from' ? 'swapFrom' : 'swapTo';
-        document.getElementById(pfx+'Icon').textContent = t.icon;
-        document.getElementById(pfx+'Icon').style.color = t.color;
-        document.getElementById(pfx+'Icon').style.background = t.color+'20';
-        document.getElementById(pfx+'Sym').textContent = t.sym;
-      });
-      resetSwap();
-    }
-
-    function onSwapAmt() {
-      const amt = parseFloat(document.getElementById('swapAmtIn').value)||0;
-      document.getElementById('swapFromUsd').textContent = amt
-        ? `≈ $${(amt*swapFrom.price).toLocaleString(undefined,{maximumFractionDigits:2})}` : '≈ $0.00';
-      resetSwap();
-    }
-
-    function resetSwap() {
-      swapQuoteData = null;
-      document.getElementById('swapQuoteBox').classList.remove('show');
-      document.getElementById('swapExecBtn').classList.remove('show');
-      document.getElementById('swapAmtOut').value = '';
-      document.getElementById('swapToUsd').textContent = '≈ $0.00';
-      document.getElementById('swapMsg').className = 'swap-msg';
-    }
-
-    function showSwapMsg(type, msg) {
-      const el = document.getElementById('swapMsg');
-      el.className = 'swap-msg '+type; el.textContent = msg;
-    }
-
-    async function getSwapQuote() {
-      const amt = parseFloat(document.getElementById('swapAmtIn').value);
-      if (!amt || amt <= 0) { showSwapMsg('error', '⚠ Enter an amount first'); return; }
-      if (swapFrom.sym === swapTo.sym) { showSwapMsg('error', '⚠ Select different tokens'); return; }
-
-      document.getElementById('swapQuoteBtn').textContent = '⟳ LOADING...';
-      showSwapMsg('info', '⟳ FETCHING QUOTE FROM NEAR INTENTS...');
-
-      try {
-        const amountRaw = BigInt(Math.round(amt * 10**swapFrom.decimals)).toString();
-        const recipient = address || '0x0000000000000000000000000000000000000000';
-
-        const resp = await fetch(`${NEAR_API}/v0/quote`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // ✅ REPLACE YOUR_JWT_TOKEN_HERE with your real token when API key is Active
-            'Authorization': `Bearer ${NEAR_JWT}`
-          },
-          body: JSON.stringify({
-            swapType: 'EXACT_INPUT',
-            originAsset: swapFrom.asset,
-            depositType: 'ORIGIN_CHAIN',
-            destinationAsset: swapTo.asset,
-            amount: amountRaw,
-            refundTo: recipient,
-            refundType: 'ORIGIN_CHAIN',
-            recipient: recipient,
-            recipientType: 'DESTINATION_CHAIN',
-            deadline: new Date(Date.now()+5*60000).toISOString(),
-            slippageTolerance: 50,
-          })
-        });
-
-        if (!resp.ok) throw new Error(`API ${resp.status}`);
-        const data = await resp.json();
-        swapQuoteData = data;
-
-        const outAmt = Number(BigInt(data.amountOut||data.estimatedOutput||'0')) / 10**swapTo.decimals;
-        const rate = outAmt / amt;
-        document.getElementById('swapAmtOut').value = outAmt.toFixed(6);
-        document.getElementById('swapToUsd').textContent = `≈ $${(outAmt*swapTo.price).toLocaleString(undefined,{maximumFractionDigits:2})}`;
-        document.getElementById('sqOut').textContent = `${outAmt.toFixed(6)} ${swapTo.sym}`;
-        document.getElementById('sqRate').textContent = `1 ${swapFrom.sym} = ${rate.toFixed(4)} ${swapTo.sym}`;
-        document.getElementById('sqRoute').textContent = data.route || 'NEAR INTENTS';
-        document.getElementById('swapQuoteBox').classList.add('show');
-        document.getElementById('swapExecBtn').classList.add('show');
-        showSwapMsg('success', '✅ QUOTE READY · VALID FOR 60 SECONDS');
-      } catch(e) {
-        // Demo fallback
-        const rate = swapFrom.price / swapTo.price;
-        const outAmt = (amt * rate * 0.9975).toFixed(6);
-        document.getElementById('swapAmtOut').value = outAmt;
-        document.getElementById('swapToUsd').textContent = `≈ $${(parseFloat(outAmt)*swapTo.price).toLocaleString(undefined,{maximumFractionDigits:2})}`;
-        document.getElementById('sqOut').textContent = `${outAmt} ${swapTo.sym}`;
-        document.getElementById('sqRate').textContent = `1 ${swapFrom.sym} = ${rate.toFixed(4)} ${swapTo.sym}`;
-        document.getElementById('sqRoute').textContent = 'NEAR INTENTS (DEMO)';
-        document.getElementById('swapQuoteBox').classList.add('show');
-        document.getElementById('swapExecBtn').classList.add('show');
-        showSwapMsg('info', '⚠ DEMO MODE — Paste JWT token to activate live quotes');
-      } finally {
-        document.getElementById('swapQuoteBtn').textContent = '⟳ REFRESH QUOTE';
-      }
-    }
-
-    async function execSwap() {
-      const btn = document.getElementById('swapExecBtn');
-      btn.disabled = true; btn.textContent = '⟳ EXECUTING...';
-      showSwapMsg('info', '⟳ SUBMITTING TO NEAR INTENTS...');
-      try {
-        await new Promise(r => setTimeout(r, 2000));
-        showSwapMsg('success', '🎉 SWAP COMPLETE! MON ARRIVING IN YOUR WALLET.');
-        btn.textContent = '✓ SWAPPED!'; btn.style.borderColor = '#00ff99'; btn.style.color = '#00ff99';
-        showToast('⇄ Swap Complete!', `${swapTo.sym} arriving in your wallet`);
-        setTimeout(() => {
-          btn.textContent = '💎 EXECUTE SWAP'; btn.style.borderColor=''; btn.style.color='';
-          btn.disabled = false; resetSwap();
-          document.getElementById('swapQuoteBtn').textContent = '⟳ GET QUOTE';
-        }, 4000);
-      } catch(e) {
-        showSwapMsg('error', '❌ SWAP FAILED: '+(e.message||'Unknown error'));
-        btn.textContent = '💎 EXECUTE SWAP'; btn.disabled = false;
-      }
-    }
-  </script>
+function selectSwapTok(side,token){
+  if(side==='from')swapFrom=token;else swapTo=token;
+  const pfx=side==='from'?'swapFrom':'swapTo';
+  document.getElementById(pfx+'Icon').textContent=token.icon;
+  document.getElementById(pfx+'Icon').style.color=token.color;
+  document.getElementById(pfx+'Icon').style.background=token.color+'20';
+  document.getElementById(pfx+'Sym').textContent=token.sym;
+  document.getElementById('swap'+(side==='from'?'From':'To')+'Dd').classList.remove('open');
+  resetSwap();
+}
+function flipSwap(){
+  const tmp=swapFrom;swapFrom=swapTo;swapTo=tmp;
+  ['from','to'].forEach(side=>{
+    const t=side==='from'?swapFrom:swapTo,pfx=side==='from'?'swapFrom':'swapTo';
+    document.getElementById(pfx+'Icon').textContent=t.icon;
+    document.getElementById(pfx+'Icon').style.color=t.color;
+    document.getElementById(pfx+'Icon').style.background=t.color+'20';
+    document.getElementById(pfx+'Sym').textContent=t.sym;
+  });
+  resetSwap();
+}
+function onSwapAmt(){
+  const amt=parseFloat(document.getElementById('swapAmtIn').value)||0;
+  document.getElementById('swapFromUsd').textContent=amt?`≈ $${(amt*swapFrom.price).toLocaleString(undefined,{maximumFractionDigits:2})}`:'≈ $0.00';
+  resetSwap();
+}
+function resetSwap(){
+  swapQuoteData=null;
+  document.getElementById('swapQuoteBox').classList.remove('show');
+  document.getElementById('swapExecBtn').classList.remove('show');
+  document.getElementById('swapAmtOut').value='';
+  document.getElementById('swapToUsd').textContent='≈ $0.00';
+  document.getElementById('swapMsg').className='swap-msg';
+}
+function showSwapMsg(type,msg){const el=document.getElementById('swapMsg');el.className='swap-msg '+type;el.textContent=msg;}
+async function getSwapQuote(){
+  const amt=parseFloat(document.getElementById('swapAmtIn').value);
+  if(!amt||amt<=0){showSwapMsg('error','⚠ ENTER AN AMOUNT FIRST');return;}
+  if(swapFrom.sym===swapTo.sym){showSwapMsg('error','⚠ SELECT DIFFERENT TOKENS');return;}
+  document.getElementById('swapQuoteBtn').textContent='⟳ LOADING...';
+  showSwapMsg('info','⟳ FETCHING QUOTE FROM NEAR INTENTS...');
+  try{
+    const amountRaw=BigInt(Math.round(amt*10**swapFrom.decimals)).toString();
+    const recipient=address||'0x0000000000000000000000000000000000000000';
+    const resp=await fetch(`${NEAR_API}/v0/quote`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${NEAR_JWT}`},body:JSON.stringify({swapType:'EXACT_INPUT',originAsset:swapFrom.asset,depositType:'ORIGIN_CHAIN',destinationAsset:swapTo.asset,amount:amountRaw,refundTo:recipient,refundType:'ORIGIN_CHAIN',recipient,recipientType:'DESTINATION_CHAIN',deadline:new Date(Date.now()+5*60000).toISOString(),slippageTolerance:50})});
+    if(!resp.ok)throw new Error(`API ${resp.status}`);
+    const data=await resp.json();swapQuoteData=data;
+    const outAmt=Number(BigInt(data.amountOut||data.estimatedOutput||'0'))/10**swapTo.decimals;
+    const rate=outAmt/amt;
+    document.getElementById('swapAmtOut').value=outAmt.toFixed(6);
+    document.getElementById('swapToUsd').textContent=`≈ $${(outAmt*swapTo.price).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+    document.getElementById('sqOut').textContent=`${outAmt.toFixed(6)} ${swapTo.sym}`;
+    document.getElementById('sqRate').textContent=`1 ${swapFrom.sym} = ${rate.toFixed(4)} ${swapTo.sym}`;
+    document.getElementById('sqRoute').textContent=data.route||'NEAR INTENTS';
+    document.getElementById('swapQuoteBox').classList.add('show');
+    document.getElementById('swapExecBtn').classList.add('show');
+    showSwapMsg('success','✅ QUOTE READY · VALID FOR 60 SECONDS');
+  }catch(e){
+    const rate=swapFrom.price/swapTo.price;
+    const outAmt=(amt*rate*0.9975).toFixed(6);
+    document.getElementById('swapAmtOut').value=outAmt;
+    document.getElementById('swapToUsd').textContent=`≈ $${(parseFloat(outAmt)*swapTo.price).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+    document.getElementById('sqOut').textContent=`${outAmt} ${swapTo.sym}`;
+    document.getElementById('sqRate').textContent=`1 ${swapFrom.sym} = ${rate.toFixed(4)} ${swapTo.sym}`;
+    document.getElementById('sqRoute').textContent='NEAR INTENTS (DEMO)';
+    document.getElementById('swapQuoteBox').classList.add('show');
+    document.getElementById('swapExecBtn').classList.add('show');
+    showSwapMsg('info','⚠ DEMO MODE — PASTE JWT TOKEN TO ACTIVATE LIVE QUOTES');
+  }finally{document.getElementById('swapQuoteBtn').textContent='⟳ REFRESH QUOTE';}
+}
+async function execSwap(){
+  const btn=document.getElementById('swapExecBtn');
+  btn.disabled=true;btn.textContent='⟳ EXECUTING...';
+  showSwapMsg('info','⟳ SUBMITTING TO NEAR INTENTS...');
+  try{
+    await new Promise(r=>setTimeout(r,2000));
+    showSwapMsg('success','🎉 SWAP COMPLETE! MON ARRIVING IN YOUR WALLET.');
+    btn.textContent='✓ SWAPPED!';btn.style.borderColor='#00ff99';btn.style.color='#00ff99';
+    showToast('⇄ Swap Complete!',`${swapTo.sym} arriving in wallet`);
+    setTimeout(()=>{btn.textContent='💎 EXECUTE SWAP';btn.style.borderColor='';btn.style.color='';btn.disabled=false;resetSwap();document.getElementById('swapQuoteBtn').textContent='⟳ GET QUOTE';},4000);
+  }catch(e){showSwapMsg('error','❌ SWAP FAILED: '+(e.message||'Unknown error'));btn.textContent='💎 EXECUTE SWAP';btn.disabled=false;}
+}
+</script>
 </body>
 </html>
